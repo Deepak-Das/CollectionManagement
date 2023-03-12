@@ -35,10 +35,8 @@ import com.example.collectionmanagement.R
 import com.example.collectionmanagement.collection_book.domain.utils.Ams
 import com.example.collectionmanagement.collection_book.prentation.Home.HomeViewModel.HomeViewModel
 import com.example.collectionmanagement.collection_book.prentation.navigation.Router
+import com.example.collectionmanagement.collection_book.prentation.theme.option4
 import com.example.collectionmanagement.collection_book.prentation.theme.option5
-import com.maxkeppeler.sheets.calendar.CalendarDialog
-import com.maxkeppeler.sheets.calendar.models.CalendarConfig
-import com.maxkeppeler.sheets.calendar.models.CalendarSelection
 import kotlinx.coroutines.launch
 
 
@@ -55,7 +53,7 @@ fun HomePage(
     val scope = rememberCoroutineScope()
 
 
-    val homeState = viewModel.state.value;
+    val homeState = viewModel.state.value
 
 
 
@@ -88,12 +86,12 @@ fun HomePage(
                             selectedItem.value = item
                             scope.launch {
                                 if (selectedItem.value == viewModel.drawerList[1]) {
-                                    viewModel.exportDb(context);
+                                    viewModel.exportDb(context)
                                 } else if (selectedItem.value == viewModel.drawerList[2]) {
                                 } else {
                                     viewModel.importDb(
                                         context = context, activity = ComponentActivity()
-                                    );
+                                    )
                                 }
                                 drawerState.close()
 
@@ -113,7 +111,7 @@ fun HomePage(
                 IconButton(onClick = {
                     scope.launch {
                         if (drawerState.isClosed) {
-                            drawerState.open();
+                            drawerState.open()
                         }
                     }
 
@@ -134,8 +132,7 @@ fun HomePage(
 
                 Column(
                     Modifier
-                        .fillMaxWidth()
-                        ,
+                        .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Row(
@@ -169,14 +166,16 @@ fun HomePage(
                     Spacer(modifier = Modifier.size(10.dp))
                     DatePickComp(
                         date = homeState.date,
-                        f = { t,d->
-                            viewModel.setHomeDateAndTimeStamp(timeStamp = t, date = d)
-                        }
+//                        f = { t, d ->
+//
+//                            viewModel.setHomeDateAndTimeStamp(timeStamp = t, date = d)
+//                        }
+                    f=viewModel::setHomeDateAndTimeStamp
                     )
                 }
 
 
-//                Spacer(modifier = Modifier.size(60.dp))
+
                 Column {
                     viewModel.bodyList.map {
                         customButton(
@@ -262,35 +261,22 @@ fun customButton(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickComp(
-    date:String,
-    f:(Long,String)-> Unit
+    date: String,
+    f: (Long, String) -> Unit
 ) {
 
 
-    val calenderState = com.maxkeppeker.sheets.core.models.base.rememberSheetState();
     val colInteraction = remember { MutableInteractionSource() }
-    val scope = rememberCoroutineScope()
+    val calenderState = com.maxkeppeker.sheets.core.models.base.rememberSheetState()
 
-    CalendarDialog(
-        state = calenderState,
-        selection = CalendarSelection.Date {
-            scope.launch {
-                f(Ams.dateToTimeStamp(Ams.localDateToDate(it)), Ams.localDateToDate(it))
-            }
-
-        },
-        config = CalendarConfig(
-            monthSelection = true,
-            yearSelection = true
-        )
-    )
+    Ams.CalenderPop(f=f,calenderState = calenderState)
 
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .padding(10.dp)
             .width(LocalConfiguration.current.screenWidthDp.dp - 130.dp)
-            .background(color = option5, shape = ShapeDefaults.Medium)
+            .background(color = option4, shape = ShapeDefaults.Medium)
             .clickable(
                 onClick = {
                     Log.d(TAG, "HomePage: Click")
@@ -323,4 +309,6 @@ fun DatePickComp(
         }
     }
 }
+
+
 
