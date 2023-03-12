@@ -12,3 +12,13 @@ val Pink40 = Color(0xFF7D5260)
 
 
 val dailyColor=Color(0xff78C39F)
+val debtorColor=Color(0xff3BAEB6)
+val loneColor=Color(0xff51829D)
+
+
+val option1 = Color(0xFF268CD6)
+val option2 = Color(0xFF23AF96)
+val option3 = Color(0xFFA253BE)
+val option4 = Color(0xff257B81)
+val option5 = Color(0xFFF87272)
+val option6 = Color(0xFFFF9800)
