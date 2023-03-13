@@ -2,7 +2,6 @@ package com.example.collectionmanagement.collection_book.domain.utils
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.progressSemantics
@@ -11,7 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -24,7 +23,6 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.maxkeppeker.sheets.core.models.base.SheetState
-import com.maxkeppeker.sheets.core.models.base.rememberSheetState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
 import com.maxkeppeler.sheets.calendar.models.CalendarSelection
@@ -33,7 +31,6 @@ import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
-import androidx.compose.runtime.rememberCoroutineScope as rememberCoroutineScope
 
 
 object Ams {
@@ -101,9 +98,9 @@ object Ams {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun CalenderPop(
-        f:(Long,String)->Unit,
-        calenderState:SheetState
-    ){
+        f: (Long, String) -> Unit,
+        calenderState: SheetState
+    ) {
 
         val scope = rememberCoroutineScope()
 
@@ -140,11 +137,17 @@ object Ams {
     }
 
 
-    fun getMStyle(color: Color =Color.Black, fontSize: TextUnit =16.sp): TextStyle {
-        return TextStyle(color = color,fontWeight= FontWeight.SemiBold, fontSize = fontSize)
+    fun getMStyle(color: Color = Color.Black, fontSize: TextUnit = 16.sp): TextStyle {
+        return TextStyle(color = color, fontWeight = FontWeight.Medium, fontSize = fontSize)
     }
 
+    fun getRStyle(color: Color = Color.Black, fontSize: TextUnit = 16.sp): TextStyle {
+        return TextStyle(color = color, fontWeight = FontWeight.Normal, fontSize = fontSize)
+    }
 
+    fun getBStyle(color: Color = Color.Black, fontSize: TextUnit = 16.sp): TextStyle {
+        return TextStyle(color = color, fontWeight = FontWeight.SemiBold, fontSize = fontSize)
+    }
 
 
 }

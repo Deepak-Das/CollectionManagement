@@ -6,6 +6,7 @@ import com.example.collectionmanagement.collection_book.data.data_source.AppData
 import com.example.collectionmanagement.collection_book.data.repositoryImp.DebtorRepoImp
 import com.example.collectionmanagement.collection_book.domain.repository.DebtorRepository
 import com.example.collectionmanagement.collection_book.domain.use_case.GetAllDebtor
+import com.example.collectionmanagement.collection_book.domain.use_case.SaveUpdateDebtor
 import com.example.collectionmanagement.collection_book.domain.use_case.UserCases
 import dagger.Module
 import dagger.Provides
@@ -29,7 +30,10 @@ object AppModule {
     fun getUseCase(
         debtorRepository: DebtorRepository
     ): UserCases {
-        return UserCases(getAllDebtor = GetAllDebtor(debtorRepository))
+        return UserCases(
+            getAllDebtor = GetAllDebtor(debtorRepository),
+            saveUpdateDebtor = SaveUpdateDebtor(debtorRepository )
+        )
     }
 
     @Provides

@@ -8,7 +8,7 @@ import javax.inject.Inject
 
 class GetAllDebtor @Inject constructor(private val repository: DebtorRepository) {
 
-    suspend operator fun invoke(): Flow<List<Debtor>> {
+      operator fun invoke(): Flow<List<Debtor>> {
 
         return repository.getAllDebtor().map { it ->
             it.sortedByDescending { it.debtorId }

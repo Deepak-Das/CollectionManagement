@@ -61,24 +61,20 @@ class HomeViewModel @Inject constructor(
 
     fun importDb(context: Context, activity: ComponentActivity) {
         viewModelScope.launch {
-            setProgress(true);
 
 
             db.close()
 
 
             val dbFile = context.getDatabasePath(AppDatabase.DATABASE_NAME)
-            if (!dbFile.exists()) return@launch
+//            if (!dbFile.exists()) return@launch
 
-            val backupFile = File(
-                context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
-                "MyDatabaseBackup/${AppDatabase.DATABASE_NAME}"
-            )
+            val backupFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "MyDatabaseBackup/${AppDatabase.DATABASE_NAME}")
+
             backupFile.copyTo(dbFile, true)
 
             Toast.makeText(context, "Successful imported Db", Toast.LENGTH_SHORT).show()
-            delay(5000);
-            setProgress(false);
+            delay(1000);
 
             closeApp(activity);
 
