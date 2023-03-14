@@ -3,14 +3,13 @@ package com.example.collectionmanagement.collection_book.prentation.Debtor
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.collectionmanagement.collection_book.domain.model.Debtor
 import com.example.collectionmanagement.collection_book.domain.use_case.UserCases
-import com.example.collectionmanagement.collection_book.prentation.Home.HomeViewModel.DebtorState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -42,6 +41,18 @@ class DebtorViewModel @Inject constructor(
         }
 
     }
+    fun setUpdateStatus(status: Boolean,debtor: Debtor) {
+        val TAG = "DebtorModel"
+        Log.d(TAG, "update: ${status}")
+        viewModelScope.launch {
+            _state.value = state.value.copy(
+                updateStatus = status,
+                updateDebtor=debtor
+            )
+
+        }
+
+    }
     fun setSearch(query: String) {
 
         viewModelScope.launch {
@@ -61,7 +72,7 @@ class DebtorViewModel @Inject constructor(
                     name = name,
                     address = addr,
                     timestamp = timeStamp,
-                    color = 2
+                    color = Debtor.colorCode().toArgb()
                 )
             )
         }

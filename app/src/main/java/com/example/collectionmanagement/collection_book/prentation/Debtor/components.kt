@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.zIndex
 import com.example.collectionmanagement.R
 import com.example.collectionmanagement.collection_book.domain.model.Debtor
 import com.example.collectionmanagement.collection_book.domain.utils.Ams
@@ -32,11 +33,11 @@ import java.util.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DebtorCard(
-    debtor: Debtor
+    debtor: Debtor,
+    getDebtor:(Debtor)->Unit
 ) {
     Card(
 
-        onClick = { /*TODO*/ },
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
@@ -69,9 +70,9 @@ fun DebtorCard(
                     Column {
                         CustomIconText(icon = Icons.Default.Person, txt = debtor.name)
                         Spacer(modifier = Modifier.size(10.dp))
-                        CustomIconText(icon = Icons.Default.Phone, txt = debtor.address.toString())
+                        CustomIconText(icon = Icons.Default.Phone, txt = "+91")
                         Spacer(modifier = Modifier.size(10.dp))
-                        CustomIconText(icon = Icons.Default.LocationOn, txt = debtor.color.toString())
+                        CustomIconText(icon = Icons.Default.LocationOn, txt = debtor.address.toString())
                     }
 
                 }
@@ -83,7 +84,11 @@ fun DebtorCard(
                             shape = MaterialTheme.shapes.medium
                         )
                         .padding(horizontal = 8.dp, vertical = 4.dp)
-                        .align(alignment = Alignment.Bottom),
+                        .align(alignment = Alignment.Bottom)
+                        .zIndex(2f)
+                        .clickable {
+                            getDebtor(debtor)
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -246,18 +251,3 @@ fun CustomSearchBar(
 }
 
 
-@Composable
-fun dropItems(
-    it: Debtor,
-    itemClick: (Debtor) -> Unit
-) {
-    Box(modifier = Modifier
-        .padding(14.dp)
-        .fillMaxWidth()
-        .background(Color.White, shape = MaterialTheme.shapes.small)
-        .clickable {
-            itemClick
-        }) {
-        Text(text = it.name, style = Ams.getRStyle())
-    }
-}
