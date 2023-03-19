@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.example.collectionmanagement.collection_book.data.data_source.AppDatabase
 import com.example.collectionmanagement.collection_book.data.repositoryImp.DebtorRepoImp
 import com.example.collectionmanagement.collection_book.domain.repository.DebtorRepository
+import com.example.collectionmanagement.collection_book.domain.use_case.DeleteDebtor
 import com.example.collectionmanagement.collection_book.domain.use_case.GetAllDebtor
 import com.example.collectionmanagement.collection_book.domain.use_case.SaveUpdateDebtor
 import com.example.collectionmanagement.collection_book.domain.use_case.UserCases
@@ -32,7 +33,8 @@ object AppModule {
     ): UserCases {
         return UserCases(
             getAllDebtor = GetAllDebtor(debtorRepository),
-            saveUpdateDebtor = SaveUpdateDebtor(debtorRepository )
+            saveUpdateDebtor = SaveUpdateDebtor(debtorRepository ),
+            deletedebtor = DeleteDebtor(debtorRepository ),
         )
     }
 

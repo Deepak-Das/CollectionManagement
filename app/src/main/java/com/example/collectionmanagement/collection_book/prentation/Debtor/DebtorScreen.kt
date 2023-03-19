@@ -21,8 +21,6 @@ import com.example.collectionmanagement.collection_book.prentation.Debtor.Custom
 import com.example.collectionmanagement.collection_book.prentation.Debtor.DebtorCard
 import com.example.collectionmanagement.collection_book.prentation.Debtor.DebtorViewModel
 import kotlinx.coroutines.launch
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 
 
 //import androidx.compose.material.icons
@@ -35,7 +33,7 @@ fun DebtorScreen(
     viewModel: DebtorViewModel = hiltViewModel()
 ) {
 
-    var scope = rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
     val state = viewModel.state.value
 
 
@@ -77,10 +75,17 @@ fun DebtorScreen(
                     }) {
                         DebtorCard(debtor = it, getDebtor = {
 
+                            scope.launch {
+                                viewModel.setUpdateStatus(true, it)
+                            }
+                        },
+                            deleteDebtor = {
                                 scope.launch {
-                                    viewModel.setUpdateStatus(true,it)
+                                    viewModel.setDeleteDebtor(debtor = it)
+                                    viewModel.setWaring(true)
                                 }
-                        })
+                            }
+                        )
 
 
                         Spacer(modifier = Modifier.size(10.dp))
@@ -88,8 +93,12 @@ fun DebtorScreen(
                 } else {
                     items(state.list) {
                         DebtorCard(debtor = it, getDebtor = {
-                            scope.launch {viewModel.setUpdateStatus(true,it)}
-                        })
+                            scope.launch { viewModel.setUpdateStatus(true, it) }
+                        },
+                            deleteDebtor = {
+                                scope.launch { viewModel.setDeleteDebtor(debtor = it) }
+                            }
+                        )
 
                         Spacer(modifier = Modifier.size(10.dp))
                     }
@@ -111,12 +120,22 @@ fun DebtorScreen(
                 setVal = viewModel::saveUpdate
             )
 
+            Ams.Waring(
+                msg="Are u sure want to delete",
+                status=state.waring,
+                openDialog = viewModel::setWaring,
+                onclickSure = viewModel::deleteDebtor,
+                onclickCancel = viewModel::setWaring
+            )
+
 
         }
     }
 
 
 }
+
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -143,7 +162,7 @@ fun AddDebtor(
         AlertDialog(
             onDismissRequest = { openDialog(false) }
         ) {
-            Card() {
+            Card {
                 Column(
                     Modifier.padding(vertical = 10.dp, horizontal = 20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -153,7 +172,7 @@ fun AddDebtor(
 
                     OutlinedTextField(
                         value = name,
-                        maxLines=1,
+                        maxLines = 1,
                         onValueChange = { name = it },
                         label = { Text(text = "Name") },
                         leadingIcon = {
@@ -162,9 +181,9 @@ fun AddDebtor(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
                     )
                     OutlinedTextField(
-                        enabled=false,
+                        enabled = false,
                         value = phone,
-                        maxLines=1,
+                        maxLines = 1,
                         onValueChange = { phone = it },
                         label = { Text(text = "Phone") },
                         leadingIcon = {
@@ -174,7 +193,7 @@ fun AddDebtor(
                     )
                     OutlinedTextField(
                         value = addr,
-                        maxLines=1,
+                        maxLines = 1,
                         onValueChange = { addr = it },
                         label = { Text(text = "Address") },
                         leadingIcon = {
@@ -184,17 +203,18 @@ fun AddDebtor(
                     )
 
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                        TextButton(onClick = { openDialog(false)
-                            name=""
-                            addr=""
+                        TextButton(onClick = {
+                            openDialog(false)
+                            name = ""
+                            addr = ""
                         }) {
                             Text(text = "Cancel", style = Ams.getMStyle())
                         }
                         TextButton(onClick = {
                             openDialog(false)
                             setVal(null, name, addr, System.currentTimeMillis())
-                            name=""
-                            addr=""
+                            name = ""
+                            addr = ""
                         }) {
                             Text(text = "save", style = Ams.getMStyle())
                         }
@@ -213,7 +233,7 @@ fun AddDebtor(
 @Composable
 fun UpdateDebtor(
     status: Boolean,
-    openDialog: (Boolean,Debtor) -> Unit,
+    openDialog: (Boolean, Debtor) -> Unit,
     debtor: Debtor,
     setVal: (Int?, String, String, Long) -> Unit,
 
@@ -250,9 +270,9 @@ fun UpdateDebtor(
 
     if (status) {
         AlertDialog(
-            onDismissRequest = { openDialog(false,debtor) }
+            onDismissRequest = { openDialog(false, debtor) }
         ) {
-            Card() {
+            Card {
                 Column(
                     Modifier.padding(vertical = 10.dp, horizontal = 20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -273,9 +293,9 @@ fun UpdateDebtor(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
                     )
                     OutlinedTextField(
-                        enabled=false,
+                        enabled = false,
                         value = phone,
-                        readOnly=true,
+                        readOnly = true,
                         onValueChange = { phone = it },
                         label = { Text(text = "Phone") },
                         maxLines = 1,
@@ -296,11 +316,11 @@ fun UpdateDebtor(
                     )
 
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                        TextButton(onClick = { openDialog(false,debtor) }) {
+                        TextButton(onClick = { openDialog(false, debtor) }) {
                             Text(text = "Cancel", style = Ams.getMStyle())
                         }
                         TextButton(onClick = {
-                            openDialog(false,debtor)
+                            openDialog(false, debtor)
                             setVal(debtor.debtorId, name, addr, debtor.timestamp)
 
                         }) {

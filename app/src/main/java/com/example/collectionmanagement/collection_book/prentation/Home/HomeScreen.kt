@@ -4,6 +4,7 @@ import android.content.ContentValues.TAG
 import android.content.Context
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -36,16 +37,15 @@ import com.example.collectionmanagement.collection_book.domain.utils.Ams
 import com.example.collectionmanagement.collection_book.prentation.Home.HomeViewModel.HomeViewModel
 import com.example.collectionmanagement.collection_book.prentation.navigation.Router
 import com.example.collectionmanagement.collection_book.prentation.theme.option4
-import com.example.collectionmanagement.collection_book.prentation.theme.option5
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun HomePage(
     viewModel: HomeViewModel = hiltViewModel(),
     context: Context = LocalContext.current,
-    navHostController: NavHostController
+    navHostController: NavHostController,
 ) {
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -203,7 +203,7 @@ fun HomePage(
 }
 
 @Composable
-fun customButton(
+private fun customButton(
     iconResource: Int, text: String, color: Color, f: () -> Unit
 ) {
 

@@ -19,7 +19,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
@@ -27,17 +26,17 @@ import androidx.compose.ui.zIndex
 import com.example.collectionmanagement.R
 import com.example.collectionmanagement.collection_book.domain.model.Debtor
 import com.example.collectionmanagement.collection_book.domain.utils.Ams
-import com.example.collectionmanagement.collection_book.prentation.theme.option1
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DebtorCard(
     debtor: Debtor,
-    getDebtor:(Debtor)->Unit
+    getDebtor: (Debtor) -> Unit,
+    deleteDebtor: (Debtor) -> Unit,
 ) {
     Card(
-
+        modifier=Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
@@ -46,13 +45,9 @@ fun DebtorCard(
 
     ) {
 
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 10.dp, bottom = 10.dp, end = 20.dp, start = 10.dp),
-        ) {
+
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxSize().padding(10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -63,7 +58,10 @@ fun DebtorCard(
                         modifier = Modifier
                             .width(6.dp)
                             .height(100.dp)
-                            .background(color = Color(debtor.color), shape = MaterialTheme.shapes.medium),
+                            .background(
+                                color = Color(debtor.color),
+                                shape = MaterialTheme.shapes.medium
+                            ),
                     )
                     Spacer(modifier = Modifier.size(10.dp))
 
@@ -72,44 +70,97 @@ fun DebtorCard(
                         Spacer(modifier = Modifier.size(10.dp))
                         CustomIconText(icon = Icons.Default.Phone, txt = "+91")
                         Spacer(modifier = Modifier.size(10.dp))
-                        CustomIconText(icon = Icons.Default.LocationOn, txt = debtor.address.toString())
+                        Row(
+                            modifier=Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ){
+                        CustomIconText(
+                            icon = Icons.Default.LocationOn,
+                            txt = debtor.address.toString()
+                        )
+                            Box(modifier =Modifier.align (alignment = Alignment.Bottom),
+                                contentAlignment = Alignment.Center
+                            ){
+                                Row(horizontalArrangement = Arrangement.SpaceAround, verticalAlignment = Alignment.CenterVertically) {
+                                    Box(
+                                        Modifier
+                                            .background(
+                                                color = MaterialTheme.colorScheme.error,
+                                                shape = MaterialTheme.shapes.medium
+                                            )
+                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                                            .align(alignment = Alignment.Bottom)
+                                            .zIndex(2f)
+                                            .clickable {
+                                                deleteDebtor(debtor)
+                                            },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.edit),
+                                                contentDescription = null,
+                                                Modifier.size(15.dp)
+                                            )
+                                            Spacer(modifier = Modifier.size(width = 5.dp, height = 0.dp))
+                                            Text(
+                                                text = "Delete",
+                                                style = Ams.getMStyle(color = Color.White, fontSize = 10.sp)
+                                            )
+                                            Spacer(modifier = Modifier.size(width = 10.dp, height = 0.dp))
+
+
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.size(10.dp))
+
+                                    Box(
+                                        Modifier
+                                            .background(
+                                                color = MaterialTheme.colorScheme.primary,
+                                                shape = MaterialTheme.shapes.medium
+                                            )
+                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                                            .align(alignment = Alignment.Bottom)
+                                            .zIndex(2f)
+                                            .clickable {
+                                                getDebtor(debtor)
+                                            },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.edit),
+                                                contentDescription = null,
+                                                Modifier.size(15.dp)
+                                            )
+                                            Spacer(modifier = Modifier.size(width = 5.dp, height = 0.dp))
+                                            Text(
+                                                text = "Edit",
+                                                style = Ams.getMStyle(color = Color.White, fontSize = 10.sp)
+                                            )
+                                            Spacer(modifier = Modifier.size(width = 5.dp, height = 0.dp))
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
 
                 }
 
-                Box(
-                    Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = MaterialTheme.shapes.medium
-                        )
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                        .align(alignment = Alignment.Bottom)
-                        .zIndex(2f)
-                        .clickable {
-                            getDebtor(debtor)
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Image(
-                            painter = painterResource(id = R.drawable.edit),
-                            contentDescription = null,
-                            Modifier.size(15.dp)
-                        )
-                        Spacer(modifier = Modifier.size(width = 5.dp, height = 0.dp))
-                        Text(
-                            text = "Edit",
-                            style = Ams.getMStyle(color = Color.White, fontSize = 10.sp)
-                        )
-                        Spacer(modifier = Modifier.size(width = 5.dp, height = 0.dp))
 
-                    }
-                }
+
+
 
 
             }
-        }
+
+
+
     }
 }
 
@@ -119,12 +170,13 @@ fun CustomIconText(
     txt: String
 ) {
     Row(
-        horizontalArrangement = Arrangement.Center,
+//        modifier=Modifier.widthIn(max = 160.dp),
+        horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(icon, contentDescription = "", tint = Color.Black)
         Spacer(modifier = Modifier.size(width = 6.dp, height = 0.dp))
-        Text(txt, style = Ams.getMStyle())
+        Text(txt, style = Ams.getMStyle(), softWrap = true)
     }
 }
 
@@ -133,8 +185,8 @@ fun CustomIconText(
 @Composable
 fun CustomSearchBar(
     getDebtor: (Debtor) -> Unit,
-    list:List<Debtor>,
-    query:String="",
+    list: List<Debtor>,
+    query: String = "",
     setQuery: (String) -> Unit
 ) {
 
@@ -151,7 +203,8 @@ fun CustomSearchBar(
 
 
     Column(Modifier
-        .fillMaxWidth().background(color=Color.Transparent)
+        .fillMaxWidth()
+        .background(color = Color.Transparent)
         .clickable(
             interactionSource = interactionSource,
             indication = null,
@@ -159,11 +212,13 @@ fun CustomSearchBar(
         )) {
         TextField(
             modifier = Modifier
-                .fillMaxWidth().background(Color.Transparent)
+                .fillMaxWidth()
+                .background(Color.Transparent)
                 .onGloballyPositioned {
                     textfieldsize = it.size.toSize()
                 },
             value = query,
+            maxLines=1,
             onValueChange = {
                 setQuery(it)
 

@@ -2,15 +2,13 @@ package com.example.collectionmanagement.collection_book.domain.utils
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.progressSemantics
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProgressIndicatorDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -117,6 +115,52 @@ object Ams {
                 yearSelection = true
             )
         )
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+//@Preview
+    @Composable
+    fun Waring(
+        status: Boolean,
+        msg: String,
+        openDialog: (Boolean) -> Unit,
+        onclickSure: () -> Unit,
+        onclickCancel: (Boolean) -> Unit,
+
+        ) {
+
+
+
+        if (status) {
+            AlertDialog(
+                onDismissRequest = { openDialog(false) }
+            ) {
+                Card(
+
+
+                ) {
+
+                    Row(Modifier.fillMaxWidth().padding(vertical = 15.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically){
+                        Indicator()
+                        Spacer(modifier = Modifier.size(10.dp))
+                        Text(msg, style = getRStyle(), softWrap = true)
+
+                    }
+                    Row(Modifier.align(Alignment.End)) {
+                        TextButton(onClick = { onclickSure() }) {
+                            Text("Sure")
+                        }
+                        TextButton(onClick = { onclickCancel(false) }) {
+                            Text("Cancel")
+                        }
+                    }
+
+
+                }
+            }
+        }
+
+
     }
 
     fun localDateToDate(it: LocalDate): String {

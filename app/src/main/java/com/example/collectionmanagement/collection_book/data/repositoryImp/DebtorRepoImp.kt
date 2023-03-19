@@ -12,6 +12,9 @@ class DebtorRepoImp (private val appDoa: AppDoa) : DebtorRepository {
         appDoa.saveDebtor(debtor);
     }
 
+    override suspend fun deleteDebtor(debtor: Debtor) {
+        appDoa.deleteDebtor(debtor)
+    }
 
     override  fun getAllDebtor(): Flow<List<Debtor>> {
         return appDoa.getDebtors();

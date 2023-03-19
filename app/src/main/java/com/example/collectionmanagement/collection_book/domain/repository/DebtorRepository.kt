@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface DebtorRepository {
 
     suspend fun saveDebtor(debtor: Debtor);
+    suspend fun deleteDebtor(debtor: Debtor);
 
      fun getAllDebtor():Flow<List<Debtor>>;
 }
