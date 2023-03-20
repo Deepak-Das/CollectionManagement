@@ -1,5 +1,6 @@
 package com.example.collectionmanagement.collection_book.prentation
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -26,7 +27,8 @@ import kotlinx.coroutines.launch
 //import androidx.compose.material.icons
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+
+
 @Preview
 @Composable
 fun DebtorScreen(
@@ -34,6 +36,7 @@ fun DebtorScreen(
 ) {
 
     val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
     val state = viewModel.state.value
 
 
@@ -51,8 +54,29 @@ fun DebtorScreen(
                 )
 
             }
-        }
-    ) {
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) {it->
+
+               var data=(it.visuals as? Ams.DefaultSnackbar)
+
+                Snackbar(
+                    action = {
+                        TextButton(onClick = { it.performAction() }) {
+                            Text("yes")
+                        }
+                    }
+                ) {
+                    data?.let { it1 -> Text(it1.message) }
+                }
+
+
+
+
+            }
+        },
+
+        ) {
         Column(
             Modifier
                 .padding(it)
@@ -121,10 +145,23 @@ fun DebtorScreen(
             )
 
             Ams.Waring(
-                msg="Are u sure want to delete",
-                status=state.waring,
+                msg = "Are u sure want to delete",
+                status = state.waring,
                 openDialog = viewModel::setWaring,
-                onclickSure = viewModel::deleteDebtor,
+                onclickSure = {
+                    viewModel.deleteDebtor()
+                    scope.launch {
+                        val snackbarResult = snackbarHostState.showSnackbar(
+                            Ams.DefaultSnackbar(message = "want to undo the last delete"),
+                        );
+
+                        when (snackbarResult) {
+                            SnackbarResult.Dismissed -> Log.d("SnackbarDemo", "Dismissed")
+                            SnackbarResult.ActionPerformed -> viewModel.undoDebtor()
+                        }
+
+                    }
+                },
                 onclickCancel = viewModel::setWaring
             )
 
@@ -134,8 +171,6 @@ fun DebtorScreen(
 
 
 }
-
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -163,6 +163,17 @@ object Ams {
 
     }
 
+    class DefaultSnackbar(
+        override val message: String,
+    ):SnackbarVisuals{
+        override val actionLabel: String?
+            get() = "Yes"
+        override val duration: SnackbarDuration
+            get() = SnackbarDuration.Long
+        override val withDismissAction: Boolean
+            get() = true
+    }
+
     fun localDateToDate(it: LocalDate): String {
         return it.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")).toString();
     }

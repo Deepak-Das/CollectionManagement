@@ -77,6 +77,17 @@ class DebtorViewModel @Inject constructor(
             )
         }
     }
+    fun undoDebtor() {
+        viewModelScope.launch {
+            state.value.debtorForDelete?.let {
+                userCases.saveUpdateDebtor(
+                    it
+                )
+            }
+        }
+    }
+
+
 
     fun setWaring(status: Boolean) {
         viewModelScope.launch {
@@ -101,9 +112,6 @@ class DebtorViewModel @Inject constructor(
             if(state.value.debtorForDelete==null) return@launch;
             state.value.debtorForDelete?.let {
                 userCases.deletedebtor(it) }
-            _state.value = state.value.copy(
-            debtorForDelete = null,
-            )
 
         }
     }
