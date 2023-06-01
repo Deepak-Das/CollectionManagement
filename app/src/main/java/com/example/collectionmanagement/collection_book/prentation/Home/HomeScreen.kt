@@ -35,17 +35,17 @@ import androidx.navigation.NavHostController
 import com.example.collectionmanagement.R
 import com.example.collectionmanagement.collection_book.domain.utils.Ams
 import com.example.collectionmanagement.collection_book.prentation.Home.HomeViewModel.HomeViewModel
-import com.example.collectionmanagement.collection_book.prentation.navigation.Router
 import com.example.collectionmanagement.collection_book.prentation.theme.option4
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomePage(
     viewModel: HomeViewModel = hiltViewModel(),
     context: Context = LocalContext.current,
     navHostController: NavHostController,
+//    navHostController: AnimatedComposeNavigator,
 ) {
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -184,7 +184,7 @@ fun HomePage(
                             color = it.color,
                             f = {
                                 scope.launch {
-                                    navHostController.navigate(route = Router.DebtorScreen.toString())
+                                    navHostController.navigate(route = it.route.toString())
 
                                 }
                             },

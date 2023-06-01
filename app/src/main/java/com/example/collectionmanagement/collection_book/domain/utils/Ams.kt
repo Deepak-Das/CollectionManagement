@@ -1,25 +1,36 @@
 package com.example.collectionmanagement.collection_book.domain.utils
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.progressSemantics
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.*
+import com.example.collectionmanagement.collection_book.domain.model.Debtor
+import com.example.collectionmanagement.collection_book.prentation.Debtor.CustomIconText
 import com.maxkeppeker.sheets.core.models.base.SheetState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
@@ -32,6 +43,134 @@ import java.util.*
 
 
 object Ams {
+
+    @OptIn(ExperimentalMaterial3Api::class)
+//@Preview
+    @Composable
+    fun CustomSearchBar(
+        getDebtor: (Debtor) -> Unit,
+        list: List<Debtor>,
+        query: String = "",
+        setQuery: (String) -> Unit
+    ) {
+
+        var interactionSource = remember {
+            MutableInteractionSource();
+        }
+
+        var textfieldsize by remember {
+            mutableStateOf(Size.Zero)
+        }
+        var expend by remember {
+            mutableStateOf(false)
+        }
+
+
+        Column(Modifier
+            .fillMaxWidth()
+            .background(color = Color.Transparent)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = { expend = true }
+            )) {
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Transparent)
+                    .onFocusChanged { it->
+                        expend = it.isFocused||it.hasFocus
+                    }
+                    .onGloballyPositioned {
+                        textfieldsize = it.size.toSize()
+                    },
+                value = query,
+                maxLines=1,
+                onValueChange = {
+                    setQuery(it)
+
+                },
+                placeholder = { Text(text = "search") },
+                trailingIcon = {
+                    IconButton(onClick = { expend = !expend }) {
+                        Icon(
+                            if (expend) Icons.Default.ArrowDownward else Icons.Default.ArrowUpward,
+                            contentDescription = null
+                        )
+                    }
+
+                },
+                leadingIcon = {
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = null)
+                    }
+                },
+                shape = MaterialTheme.shapes.medium,
+                colors = TextFieldDefaults.textFieldColors(
+                    disabledIndicatorColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                )
+
+            )
+
+            AnimatedVisibility(visible = expend) {
+                Card(
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 8.0.dp
+                    ),
+                    modifier = Modifier
+                        .width(textfieldsize.width.dp)
+                        .background(Color.White, shape = MaterialTheme.shapes.small)
+                ) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .heightIn(max = 150.dp)
+                            .width(textfieldsize.width.dp)
+                            .background(Color.White, shape = MaterialTheme.shapes.small)
+                    ) {
+
+                        if (list.isNotEmpty()) {
+                            items(list.filter {
+                                it.name.lowercase().contains(query.lowercase())
+                            }.sortedBy { it.name }
+                            ) {
+
+                                DropdownMenuItem(text = {
+                                    CustomIconText(
+                                        icon = Icons.Default.Person,
+                                        txt = it.name
+                                    )
+                                },
+                                    onClick = {
+                                        expend = false
+                                        getDebtor(it)
+                                    })
+                            }
+
+                        } else {
+                            items(list.sortedBy { it.name }) {
+                                DropdownMenuItem(text = {
+                                    CustomIconText(
+                                        icon = Icons.Default.Person,
+                                        txt = it.name
+                                    )
+                                },
+                                    onClick = {
+                                        expend = false
+                                        getDebtor(it)
+                                    })
+                            }
+                        }
+                    }
+                }
+
+            }
+
+        }
+
+
+    }
 
     @Composable
     fun Indicator(

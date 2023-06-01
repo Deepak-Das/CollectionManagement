@@ -6,6 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import com.example.collectionmanagement.collection_book.prentation.DebtorScreen
 import com.example.collectionmanagement.collection_book.prentation.Home.HomePage
+import com.example.collectionmanagement.collection_book.prentation.LoanPage
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -15,7 +16,9 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
 enum class Router{
     HomeScreen,
-    DebtorScreen
+    DebtorScreen,
+    DailyScreen,
+    LoneScreen
 
 }
 
@@ -47,7 +50,20 @@ fun ComposeNavigation(){
             },
 
         ) { DebtorScreen() }
+        composable(
+            Router.LoneScreen.toString(),
+            enterTransition = {
+                slideIntoContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(700))
 
+            },
+            exitTransition = {
+                slideOutOfContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(700))
+
+            },
+
+        ) {
+            LoanPage()
+        }
 
     }
 }

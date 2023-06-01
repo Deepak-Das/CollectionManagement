@@ -18,13 +18,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.collectionmanagement.collection_book.domain.model.Debtor
 import com.example.collectionmanagement.collection_book.domain.utils.Ams
-import com.example.collectionmanagement.collection_book.prentation.Debtor.CustomSearchBar
 import com.example.collectionmanagement.collection_book.prentation.Debtor.DebtorCard
 import com.example.collectionmanagement.collection_book.prentation.Debtor.DebtorViewModel
 import kotlinx.coroutines.launch
-
-
-//import androidx.compose.material.icons
 
 
 
@@ -56,9 +52,9 @@ fun DebtorScreen(
             }
         },
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState) {it->
+            SnackbarHost(hostState = snackbarHostState) { it ->
 
-               var data=(it.visuals as? Ams.DefaultSnackbar)
+                var data = (it.visuals as? Ams.DefaultSnackbar)
 
                 Snackbar(
                     action = {
@@ -71,8 +67,6 @@ fun DebtorScreen(
                 }
 
 
-
-
             }
         },
 
@@ -82,7 +76,7 @@ fun DebtorScreen(
                 .padding(it)
                 .padding(10.dp)
         ) {
-            CustomSearchBar(
+            Ams.CustomSearchBar(
                 getDebtor = {
 
                 },
@@ -153,7 +147,7 @@ fun DebtorScreen(
                     scope.launch {
                         val snackbarResult = snackbarHostState.showSnackbar(
                             Ams.DefaultSnackbar(message = "want to undo the last delete"),
-                        );
+                        )
 
                         when (snackbarResult) {
                             SnackbarResult.Dismissed -> Log.d("SnackbarDemo", "Dismissed")

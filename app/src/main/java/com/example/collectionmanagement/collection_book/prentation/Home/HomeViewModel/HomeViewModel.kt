@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.collectionmanagement.R
 import com.example.collectionmanagement.collection_book.data.data_source.AppDatabase
+import com.example.collectionmanagement.collection_book.prentation.navigation.Router
 import com.example.collectionmanagement.collection_book.prentation.theme.dailyColor
 import com.example.collectionmanagement.collection_book.prentation.theme.debtorColor
 import com.example.collectionmanagement.collection_book.prentation.theme.loneColor
@@ -26,9 +27,9 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     val bodyList: List<ButtonObj> = listOf(
-        ButtonObj(imgR = R.drawable.daily_pay, text = "Daily Pay", color = dailyColor),
-        ButtonObj(imgR = R.drawable.people, text = "Debtor", color = debtorColor),
-        ButtonObj(imgR = R.drawable.lone, text = "Lone", color = loneColor),
+        ButtonObj(imgR = R.drawable.daily_pay, text = "Daily Pay", color = dailyColor,route=Router.DailyScreen),
+        ButtonObj(imgR = R.drawable.people, text = "Debtor", color = debtorColor,route=Router.DebtorScreen),
+        ButtonObj(imgR = R.drawable.lone, text = "Lone", color = loneColor,route=Router.LoneScreen),
     )
     val drawerList: List<ButtonObj> = listOf(
         ButtonObj(imgR = R.drawable.home, text = "Home", color = dailyColor),
