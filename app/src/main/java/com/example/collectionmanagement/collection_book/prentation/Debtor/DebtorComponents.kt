@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.zIndex
 import com.example.collectionmanagement.R
 import com.example.collectionmanagement.collection_book.domain.model.Debtor
-import com.example.collectionmanagement.collection_book.domain.utils.Ams
+import com.example.collectionmanagement.collection_book.prentation.utils.Ams
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)

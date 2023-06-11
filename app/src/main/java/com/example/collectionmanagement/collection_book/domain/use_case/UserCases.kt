@@ -5,6 +5,6 @@ import javax.inject.Inject
 class UserCases @Inject constructor(
     val getAllDebtor: GetAllDebtor,
     val saveUpdateDebtor: SaveUpdateDebtor,
-    val deletedebtor: DeleteDebtor,
+    val deleteDebtor: DeleteDebtor,
     val getAllLone: GetAllLone,
 )

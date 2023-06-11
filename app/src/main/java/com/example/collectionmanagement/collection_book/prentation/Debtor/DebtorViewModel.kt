@@ -111,7 +111,7 @@ class DebtorViewModel @Inject constructor(
             setWaring(false)
             if(state.value.debtorForDelete==null) return@launch;
             state.value.debtorForDelete?.let {
-                userCases.deletedebtor(it) }
+                userCases.deleteDebtor(it) }
 
         }
     }

@@ -1,12 +1,18 @@
 package com.example.collectionmanagement.collection_book.prentation.Home.HomeViewModel
 
+import android.content.ComponentName
+import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Environment
 import android.os.Process
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.collectionmanagement.R
@@ -19,6 +25,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,16 +49,26 @@ class HomeViewModel @Inject constructor(
     val state: State<HomeState> = _state;
 
 
-    fun exportDb(context: Context) {
+    fun exportDb(context: Context,fileName:String) {
+
+//        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
         setProgress(true);
-        val backupDir =
+       /* val backupDir =
             File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "MyDatabaseBackup")
-        println(backupDir.absolutePath)
+        println(backupDir.absolutePath)*/
+
+        val backupDir =
+            File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "MyDatabaseBackup")
+
+            if(!backupDir.exists()){
+               backupDir.mkdirs()
+            }
+
 
         viewModelScope.launch {
             val dbFile = context.getDatabasePath(AppDatabase.DATABASE_NAME)
             backupDir.mkdirs()
-            val backupFile = File(backupDir, dbFile.name)
+            val backupFile = File(backupDir, fileName+".sql")
             dbFile.copyTo(backupFile, true)
 
             Toast.makeText(context, "Successful backup Db", Toast.LENGTH_SHORT).show()
@@ -60,32 +78,83 @@ class HomeViewModel @Inject constructor(
 
     }
 
-    fun importDb(context: Context, activity: ComponentActivity) {
+    fun importDb(context: Context, activity: ComponentActivity,uri: Uri) {
         viewModelScope.launch {
 
 
-            db.close()
+           db.close()
+
+
 
 
             val dbFile = context.getDatabasePath(AppDatabase.DATABASE_NAME)
-//            if (!dbFile.exists()) return@launch
+            val backupFile=contentUriToFile(context,uri)
 
-            val backupFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "MyDatabaseBackup/${AppDatabase.DATABASE_NAME}")
 
-            backupFile.copyTo(dbFile, true)
+            println("fileDB Db: ${dbFile.path}")
+            println("fileDB bk: ${backupFile?.path}")
+//            return@launch
+//            val backupFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "MyDatabaseBackup/${AppDatabase.DATABASE_NAME}")
 
-            Toast.makeText(context, "Successful imported Db", Toast.LENGTH_SHORT).show()
-            delay(1000);
+            if(backupFile==null){
+                Toast.makeText(context, "File not picked", Toast.LENGTH_SHORT).show()
+                return@launch
+            }
 
-            closeApp(activity);
+            try {
+                backupFile.copyTo(dbFile, overwrite = true)
+                backupFile.delete();
+                Toast.makeText(context, "Successful imported Db", Toast.LENGTH_SHORT).show()
+
+            }catch (e:NoSuchFileException){
+                Toast.makeText(context, "file not exist", Toast.LENGTH_SHORT).show()
+            }
+
+//            delay(1000);
+
+//            closeApp(activity);
+
+
+
+            restartApp(context,activity)
+
+
+
+
+
 
 
         }
     }
 
+    fun contentUriToFile(context: Context, contentUri: Uri): File? {
+        val contentResolver: ContentResolver = context.contentResolver
+        val inputStream = contentResolver.openInputStream(contentUri) ?: return null
+
+        val tempFile = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),AppDatabase.DATABASE_NAME)
+        val outputStream = FileOutputStream(tempFile)
+
+        inputStream.use { input ->
+            outputStream.use { output ->
+                input.copyTo(output)
+            }
+        }
+
+        return tempFile
+    }
+
     private fun closeApp(activity: ComponentActivity) {
         activity.finishAffinity()
         Process.killProcess(Process.myPid())
+    }
+
+ private fun restartApp(context: Context,activity: ComponentActivity) {
+     val packageManager: PackageManager = context.packageManager
+     val intent: Intent = packageManager.getLaunchIntentForPackage(context.packageName)!!
+     val componentName: ComponentName = intent.component!!
+     val restartIntent: Intent = Intent.makeRestartActivityTask(componentName)
+     context.startActivity(restartIntent)
+     Runtime.getRuntime().exit(0)
     }
 
     fun setProgress(status: Boolean) {
@@ -100,4 +169,19 @@ class HomeViewModel @Inject constructor(
             date = date
         )
     }
+    fun setIsPick(status:Boolean) {
+        viewModelScope.launch {
+            _state.value = state.value.copy(
+                isPick =  status
+            )
+        }
+    } fun setIsExport(status:Boolean) {
+        viewModelScope.launch {
+            _state.value = state.value.copy(
+                isExport =  status
+            )
+        }
+    }
+
+
 }

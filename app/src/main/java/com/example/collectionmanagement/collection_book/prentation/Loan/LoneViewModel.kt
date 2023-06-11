@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.collectionmanagement.collection_book.domain.model.Debtor
 import com.example.collectionmanagement.collection_book.domain.model.DebtorLoan
+import com.example.collectionmanagement.collection_book.domain.model.LoanWithName
 import com.example.collectionmanagement.collection_book.domain.use_case.UserCases
 import com.example.dailymoneyrecord.recorde_Book.domain.util.OrderType
 import com.example.dailymoneyrecord.recorde_Book.domain.util.Status
@@ -25,17 +26,31 @@ class LoneViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            getAllDebtor()
+            getLone()
+        }
+    }
+
+    private suspend fun getAllDebtor(){
+        viewModelScope.launch {
             userCases.getAllDebtor().collectLatest {
                 _state.value = state.value.copy(
                     debtorList = it
                 )
             }
         }
+
     }
 
-    fun getRunningLone(status: Status =Status.Running(orderType = OrderType.Descending)) {
+    private suspend fun getLone(status: Status =Status.Running(orderType = OrderType.Descending)) {
 
-        userCases.getAllLone(status =status );
+        viewModelScope.launch {
+            userCases.getAllLone(status =status ).collectLatest {
+                _state.value = state.value.copy(
+                    loneWithNameList = it
+                )
+            }
+        }
     }
 
     fun getPaidLone() {
@@ -67,6 +82,22 @@ class LoneViewModel @Inject constructor(
 
         }
 
+    }
+
+    fun setOpendialog(status:Boolean) {
+        viewModelScope.launch {
+            _state.value=state.value.copy(
+                openDialog = status
+            );
+        }
+    }
+
+    fun setEditLoneWithName(it: LoanWithName) {
+        viewModelScope.launch {
+            _state.value=state.value.copy(
+                editLoanWithName = it,
+            )
+        }
     }
 
 

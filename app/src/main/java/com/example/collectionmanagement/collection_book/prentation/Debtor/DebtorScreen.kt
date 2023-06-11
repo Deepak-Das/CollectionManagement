@@ -17,7 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.collectionmanagement.collection_book.domain.model.Debtor
-import com.example.collectionmanagement.collection_book.domain.utils.Ams
+import com.example.collectionmanagement.collection_book.prentation.utils.Ams
 import com.example.collectionmanagement.collection_book.prentation.Debtor.DebtorCard
 import com.example.collectionmanagement.collection_book.prentation.Debtor.DebtorViewModel
 import kotlinx.coroutines.launch

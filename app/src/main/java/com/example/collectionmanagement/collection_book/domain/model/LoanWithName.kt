@@ -8,5 +8,7 @@ data class LoanWithName(
     val LoneAmount:Int,
     val timeStamp: Long,
     val color:Int,
-    val status:String
+    val status:String//Runing
 )
+
+//add enum for status

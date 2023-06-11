@@ -1,4 +1,4 @@
-package com.example.collectionmanagement.collection_book.domain.utils
+package com.example.collectionmanagement.collection_book.prentation.utils
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
@@ -26,11 +26,14 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import com.example.collectionmanagement.collection_book.domain.model.Debtor
 import com.example.collectionmanagement.collection_book.prentation.Debtor.CustomIconText
+import com.example.dailymoneyrecord.recorde_Book.domain.util.OrderBy
+import com.example.dailymoneyrecord.recorde_Book.domain.util.OrderType
+import com.example.dailymoneyrecord.recorde_Book.domain.util.Status
 import com.maxkeppeker.sheets.core.models.base.SheetState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
@@ -51,18 +54,32 @@ object Ams {
         getDebtor: (Debtor) -> Unit,
         list: List<Debtor>,
         query: String = "",
-        setQuery: (String) -> Unit
+        setQuery: (String) -> Unit,
+        menuDropStatus: (Status) -> Unit = {}
     ) {
 
         var interactionSource = remember {
-            MutableInteractionSource();
+            MutableInteractionSource()
         }
 
-        var textfieldsize by remember {
+        var searchFieldsize by remember {
             mutableStateOf(Size.Zero)
         }
-        var expend by remember {
+        var isDropExpend by remember {
             mutableStateOf(false)
+        }
+        var isMenuExapend by remember {
+            mutableStateOf(false)
+        }
+        var orderType by remember {
+            mutableStateOf(OrderType.Descending)
+        }
+        var orderBy by remember {
+            mutableStateOf(OrderBy.Id(orderType = orderType))
+        }
+
+        var status by remember {
+            mutableStateOf(Status.Running(orderType = orderType))
         }
 
 
@@ -72,36 +89,43 @@ object Ams {
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
-                onClick = { expend = true }
+                onClick = { isDropExpend = true }
             )) {
             TextField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.Transparent)
-                    .onFocusChanged { it->
-                        expend = it.isFocused||it.hasFocus
+                    .onFocusChanged { it ->
+                        isDropExpend = it.isFocused || it.hasFocus
                     }
                     .onGloballyPositioned {
-                        textfieldsize = it.size.toSize()
+                        searchFieldsize = it.size.toSize()
                     },
                 value = query,
-                maxLines=1,
+                maxLines = 1,
                 onValueChange = {
                     setQuery(it)
 
                 },
                 placeholder = { Text(text = "search") },
                 trailingIcon = {
-                    IconButton(onClick = { expend = !expend }) {
+                    IconButton(onClick = {
+                        isDropExpend = !isDropExpend
+                        isMenuExapend = false
+                    }) {
                         Icon(
-                            if (expend) Icons.Default.ArrowDownward else Icons.Default.ArrowUpward,
+                            if (isDropExpend) Icons.Default.ArrowDownward else Icons.Default.ArrowUpward,
                             contentDescription = null
                         )
                     }
 
                 },
                 leadingIcon = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = {
+                        isMenuExapend = !isMenuExapend
+                        isDropExpend = false
+                        println(isMenuExapend)
+                    }) {
                         Icon(Icons.Default.MoreVert, contentDescription = null)
                     }
                 },
@@ -114,19 +138,19 @@ object Ams {
 
             )
 
-            AnimatedVisibility(visible = expend) {
+            AnimatedVisibility(visible = isDropExpend) {
                 Card(
                     elevation = CardDefaults.cardElevation(
                         defaultElevation = 8.0.dp
                     ),
                     modifier = Modifier
-                        .width(textfieldsize.width.dp)
+                        .width(searchFieldsize.width.dp)
                         .background(Color.White, shape = MaterialTheme.shapes.small)
                 ) {
                     LazyColumn(
                         modifier = Modifier
                             .heightIn(max = 150.dp)
-                            .width(textfieldsize.width.dp)
+                            .width(searchFieldsize.width.dp)
                             .background(Color.White, shape = MaterialTheme.shapes.small)
                     ) {
 
@@ -143,7 +167,7 @@ object Ams {
                                     )
                                 },
                                     onClick = {
-                                        expend = false
+                                        isDropExpend = false
                                         getDebtor(it)
                                     })
                             }
@@ -157,7 +181,7 @@ object Ams {
                                     )
                                 },
                                     onClick = {
-                                        expend = false
+                                        isDropExpend = false
                                         getDebtor(it)
                                     })
                             }
@@ -166,6 +190,24 @@ object Ams {
                 }
 
             }
+
+            AnimatedVisibility(visible = isMenuExapend) {
+                Column(
+                    modifier = Modifier
+                        .heightIn(min = 100.dp, max = 150.dp)
+                        .fillMaxWidth()
+                        .background(
+                            MaterialTheme.colorScheme.surface,
+                            shape = MaterialTheme.shapes.small
+                        )
+                ) {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement =Arrangement.Center ) {
+                        Text(text = "Sort Details", style = getRStyle(color = Color.Black))
+                    }
+                }
+
+            }
+
 
         }
 
@@ -269,18 +311,20 @@ object Ams {
         ) {
 
 
-
         if (status) {
             AlertDialog(
                 onDismissRequest = { openDialog(false) }
             ) {
-                Card(
+                Card {
 
-
-                ) {
-
-                    Row(Modifier.fillMaxWidth().padding(vertical = 15.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically){
-                        Indicator()
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 15.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+//                        Indicator()
                         Spacer(modifier = Modifier.size(10.dp))
                         Text(msg, style = getRStyle(), softWrap = true)
 
@@ -304,7 +348,7 @@ object Ams {
 
     class DefaultSnackbar(
         override val message: String,
-    ):SnackbarVisuals{
+    ) : SnackbarVisuals {
         override val actionLabel: String?
             get() = "Yes"
         override val duration: SnackbarDuration
@@ -314,7 +358,7 @@ object Ams {
     }
 
     fun localDateToDate(it: LocalDate): String {
-        return it.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")).toString();
+        return it.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")).toString()
     }
 
     fun dateToTimeStamp(date: String): Long {

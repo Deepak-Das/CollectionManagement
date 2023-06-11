@@ -5,8 +5,9 @@ import com.example.collectionmanagement.collection_book.domain.model.DebtorLoan
 import com.example.collectionmanagement.collection_book.domain.model.LoanWithName
 import com.example.collectionmanagement.collection_book.domain.repository.DebtorLoneRepository
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
- class DebtorLoneImp(private val appDoa: AppDoa): DebtorLoneRepository {
+class DebtorLoneImp @Inject constructor (private val appDoa: AppDoa): DebtorLoneRepository {
     override suspend fun saveUpdateLone(debtorLoan: DebtorLoan) {
         TODO("Not yet implemented")
     }
