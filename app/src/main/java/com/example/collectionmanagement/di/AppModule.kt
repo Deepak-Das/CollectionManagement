@@ -40,7 +40,9 @@ object AppModule {
             getAllDebtor = GetAllDebtor(debtorRepository),
             saveUpdateDebtor = SaveUpdateDebtor(debtorRepository ),
             deleteDebtor = DeleteDebtor(debtorRepository ),
-            getAllLone= GetAllLone(debtorLoneRepository)
+            getAllLone= GetAllLone(debtorLoneRepository),
+            saveUpdateLone = SaveLone(debtorLoneRepository),
+            deleteLone = DeleteLone(debtorLoneRepository)
         )
     }
 

@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.collectionmanagement.R
+import com.example.collectionmanagement.collection_book.domain.model.DebtorLoan
 import com.example.collectionmanagement.collection_book.domain.model.LoanWithName
 import com.example.collectionmanagement.collection_book.prentation.utils.Ams
 import java.util.*
@@ -26,7 +27,8 @@ import java.util.*
 fun DebtorLoneCard(
     loneWithName: LoanWithName,
     editLone: (LoanWithName) -> Unit,
-    deleteLone: (Int) -> Unit,
+    onClickDelete: (DebtorLoan) -> Unit,
+    onClickSwitch: (DebtorLoan) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -61,17 +63,31 @@ fun DebtorLoneCard(
                 Spacer(modifier = Modifier.size(10.dp))
 
                 Column(Modifier.fillMaxWidth()) {
-                    Row(Modifier.fillMaxWidth().height(20.dp),
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(20.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
-                        ) {
+                    ) {
                         CustomIconText(icon = Icons.Default.Person, txt = loneWithName.DebtorName)
                         Switch(
                             checked = loneWithName.status.equals(
                                 "running",
                                 true
                             ),
-                            onCheckedChange = {}
+                            onCheckedChange = {
+                                // str opposite of checked
+                                var str = if (loneWithName.status.equals("running", true)) "Paid" else "Running"
+                                var dl = DebtorLoan(
+                                    loneId = loneWithName.loanId,
+                                    loneHolder = loneWithName.debtorId,
+                                    amount = loneWithName.LoneAmount,
+                                    timestamp = loneWithName.timeStamp,
+                                    status = str,
+                                )
+                                onClickSwitch(dl)
+                            }
                         )
                     }
                     Spacer(modifier = Modifier.size(10.dp))
@@ -107,7 +123,14 @@ fun DebtorLoneCard(
                                         .align(alignment = Alignment.Bottom)
                                         .zIndex(2f)
                                         .clickable {
-                                            deleteLone(loneWithName.debtorId)
+                                            var dl = DebtorLoan(
+                                                loneId = loneWithName.loanId,
+                                                loneHolder = loneWithName.debtorId,
+                                                amount = loneWithName.LoneAmount,
+                                                timestamp = loneWithName.timeStamp,
+                                                status = loneWithName.status,
+                                            )
+                                            onClickDelete(dl)
                                         },
                                     contentAlignment = Alignment.Center
                                 ) {

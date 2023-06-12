@@ -404,10 +404,15 @@ fun ImportDbFilePopUp(
                     placeholder = { Text(text = "choose file") })
             }
             Spacer(modifier = Modifier.height(10.dp))
-            Button(onClick = { if(backUri!=null){
-                viewModel.importDb(context,ComponentActivity(),backUri!!)}
-            }) {
-                Text(text = "import")
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp), horizontalArrangement = Arrangement.End){
+                Button(onClick = { if(backUri!=null){
+                    viewModel.importDb(context,ComponentActivity(),backUri!!)}
+                }) {
+                    Text(text = "import")
+                }
             }
             Spacer(modifier = Modifier.height(10.dp))
 
@@ -440,7 +445,7 @@ fun ExportDbFilePopUp(
 
     var scope = rememberCoroutineScope()
     AlertDialog(onDismissRequest = { viewModel.setIsExport(false) }) {
-        Card {
+        Card() {
             Column(
                 modifier = Modifier.padding(10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -461,9 +466,15 @@ fun ExportDbFilePopUp(
                     placeholder = { Text(text = "file name") })
             }
             Spacer(modifier = Modifier.height(10.dp))
-            Text("the file will be save in documents directory", overflow = TextOverflow.Visible, style = MaterialTheme.typography.bodySmall.copy(color = Color.Red))
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                Text("the file will be save in documents directory", overflow = TextOverflow.Visible, style = MaterialTheme.typography.bodySmall.copy(color = Color.Red))
+
+            }
             Spacer(modifier = Modifier.height(10.dp))
-            Row {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp), horizontalArrangement = Arrangement.End) {
 
 
                 Button(onClick = {
@@ -473,7 +484,7 @@ fun ExportDbFilePopUp(
 
 
                 }) {
-                    Text("save")
+                    Text("export")
                 }
             }
             Spacer(modifier = Modifier.height(10.dp))

@@ -7,4 +7,6 @@ class UserCases @Inject constructor(
     val saveUpdateDebtor: SaveUpdateDebtor,
     val deleteDebtor: DeleteDebtor,
     val getAllLone: GetAllLone,
+    val saveUpdateLone: SaveLone,
+    val deleteLone: DeleteLone
 )

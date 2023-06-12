@@ -57,8 +57,7 @@ class HomeViewModel @Inject constructor(
             File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "MyDatabaseBackup")
         println(backupDir.absolutePath)*/
 
-        val backupDir =
-            File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "MyDatabaseBackup")
+        val backupDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "MyDatabaseBackup")
 
             if(!backupDir.exists()){
                backupDir.mkdirs()

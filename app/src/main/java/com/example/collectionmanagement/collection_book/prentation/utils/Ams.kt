@@ -55,7 +55,9 @@ object Ams {
         list: List<Debtor>,
         query: String = "",
         setQuery: (String) -> Unit,
-        menuDropStatus: (Status) -> Unit = {}
+        menuDropStatus: (Status) -> Unit = {} ,
+        menuContent: @Composable () -> Unit = {}
+
     ) {
 
         var interactionSource = remember {
@@ -97,6 +99,7 @@ object Ams {
                     .background(Color.Transparent)
                     .onFocusChanged { it ->
                         isDropExpend = it.isFocused || it.hasFocus
+                        isMenuExapend=false
                     }
                     .onGloballyPositioned {
                         searchFieldsize = it.size.toSize()
@@ -192,7 +195,7 @@ object Ams {
             }
 
             AnimatedVisibility(visible = isMenuExapend) {
-                Column(
+               /* Column(
                     modifier = Modifier
                         .heightIn(min = 100.dp, max = 150.dp)
                         .fillMaxWidth()
@@ -204,7 +207,8 @@ object Ams {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement =Arrangement.Center ) {
                         Text(text = "Sort Details", style = getRStyle(color = Color.Black))
                     }
-                }
+                }*/
+                menuContent()
 
             }
 

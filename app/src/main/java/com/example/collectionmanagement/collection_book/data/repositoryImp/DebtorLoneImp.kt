@@ -9,11 +9,11 @@ import javax.inject.Inject
 
 class DebtorLoneImp @Inject constructor (private val appDoa: AppDoa): DebtorLoneRepository {
     override suspend fun saveUpdateLone(debtorLoan: DebtorLoan) {
-        TODO("Not yet implemented")
+        appDoa.saveLone(debtorLoan)
     }
 
     override suspend fun deleteLone(debtorLoan: DebtorLoan) {
-        TODO("Not yet implemented")
+        appDoa.deleteLone(debtorLoan)
     }
 
     override fun getAllLone(): Flow<List<LoanWithName>> {

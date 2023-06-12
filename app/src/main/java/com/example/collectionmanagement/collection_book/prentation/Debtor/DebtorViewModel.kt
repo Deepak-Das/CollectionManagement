@@ -22,7 +22,7 @@ class DebtorViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            userCases.getAllDebtor().collectLatest {
+            userCases.getAllDebtor(state.value.orderBy).collectLatest {
                 _state.value = state.value.copy(
                     list = it
                 )
