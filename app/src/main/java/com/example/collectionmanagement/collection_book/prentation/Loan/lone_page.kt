@@ -1,11 +1,16 @@
 package com.example.collectionmanagement.collection_book.prentation
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -13,15 +18,21 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.toSize
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.collectionmanagement.collection_book.domain.model.DebtorLoan
 import com.example.collectionmanagement.collection_book.domain.model.LoanWithName
+import com.example.collectionmanagement.collection_book.prentation.Debtor.CustomIconText
 import com.example.collectionmanagement.collection_book.prentation.Loan.DebtorLoneCard
 import com.example.collectionmanagement.collection_book.prentation.Loan.LoneState
 import com.example.collectionmanagement.collection_book.prentation.Loan.LoneViewModel
@@ -72,7 +83,22 @@ fun LoanPage(
 
             }
         },
-    ) {
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                viewModel.setAddLoneDialog(true)
+
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null,
+                    Modifier.size(60.dp),
+                    tint = MaterialTheme.colorScheme.tertiary
+                )
+
+            }
+        },
+
+        ) {
         Column(
             Modifier
                 .padding(it)
@@ -116,7 +142,7 @@ fun LoanPage(
                             loneWithName = it, editLone = { loneWithName ->
 
                                 viewModel.setEditLoneWithName(it)
-                                viewModel.setOpendialog(true)
+                                viewModel.setOpenDialog(true)
                                 println(loneWithName.DebtorName)
 
                             }, onClickDelete = viewModel::setDeleteLoneData,
@@ -132,14 +158,17 @@ fun LoanPage(
 
             UpdateDebtorLone(
 
-                status = state.openDialog,
+                status = state.openUpdateDialog,
                 loanWithName = state.editLoanWithName,
-                setStatusFn = {
-
-                    viewModel.setOpendialog(it)
-
-                },
+                setStatusFn = viewModel::setOpenDialog,
                 updateLoneFn = viewModel::saveUpdateLone
+            )
+
+            AddDebtorLone(
+                status = state.openAddDialog,
+                setStatusFn = viewModel::setAddLoneDialog,
+                onClickAdd = viewModel::saveUpdateLone,
+                viewModel=viewModel
             )
 
             Ams.Waring(
@@ -375,8 +404,10 @@ fun AddDebtorLone(
     status: Boolean,
     setStatusFn: (Boolean) -> Unit,
     onClickAdd: (DebtorLoan) -> Unit,
+    viewModel: LoneViewModel,
+    context:Context = LocalContext.current
 
-    ) {
+) {
 
     val calenderState = rememberSheetState()
 
@@ -388,19 +419,32 @@ fun AddDebtorLone(
         mutableStateOf("")
     }
     var debtorId by remember {
-        mutableStateOf("")
+        mutableStateOf<Int?>(null)
     }
     var amount by remember {
         mutableStateOf("")
     }
 
-    var textFieldSize:Size
+    var searchFieldsize by remember {
+        mutableStateOf(Size.Zero)
+    }
+
+    var isDebtorExpend by remember {
+
+        mutableStateOf(false)
+    }
 
 
 
     Ams.CalenderPop(f = { timeStamp, dateStr ->
         date = dateStr
     }, calenderState = calenderState)
+
+    LaunchedEffect(key1 = true, block = {
+        date=Ams.GLOBLE_DATE
+    })
+
+
 
 
     if (status) {
@@ -416,22 +460,92 @@ fun AddDebtorLone(
                     Spacer(modifier = Modifier.size(14.dp))
 
                     OutlinedTextField(
-                        modifier=Modifier.onGloballyPositioned {
-
-                        },
+                        modifier = Modifier
+                            .onGloballyPositioned {
+                                searchFieldsize = it.size.toSize()
+                            }
+                            .onFocusChanged {
+                                isDebtorExpend = it.isFocused
+                            },
+                        singleLine=true,
                         value = name,
-                        readOnly = true,
                         maxLines = 1,
-                        onValueChange = { name = it },
+                        keyboardActions = KeyboardActions(
+                            onNext = {
+                                calenderState.show()
+                            }
+                        ),
+
+                    onValueChange = { name = it },
                         label = { Text(text = "Name") },
-                        placeholder={
-                            Text("--select on clicking icon--")
-                        },
+//                        placeholder = {
+//                            Text("--select on clicking icon--")
+//                        },
                         leadingIcon = {
-                            Icon(Icons.Default.Person, contentDescription = null)
+                            Icon(
+                                modifier = Modifier.clickable { isDebtorExpend=!isDebtorExpend },
+                                imageVector = Icons.Default.Person,
+                                contentDescription = null)
                         },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Next)
                     )
+                    AnimatedVisibility(visible = isDebtorExpend) {
+                        Card(
+                            elevation = CardDefaults.cardElevation(
+                                defaultElevation = 8.0.dp
+                            ),
+                            modifier = Modifier
+                                .width(searchFieldsize.width.dp)
+                                .background(Color.White, shape = MaterialTheme.shapes.small)
+                        ) {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .heightIn(max = 150.dp)
+                                    .width(searchFieldsize.width.dp)
+                                    .background(Color.White, shape = MaterialTheme.shapes.small)
+                            ) {
+
+                                if (viewModel.state.value.debtorList.isNotEmpty()) {
+                                    items(viewModel.state.value.debtorList.filter {
+//                                        it.name.lowercase().contains(name.lowercase())
+                                        it.name.contains(name, true)
+                                    }.sortedBy { it.name }
+                                    ) {
+
+                                        DropdownMenuItem(text = {
+                                            CustomIconText(
+                                                icon = Icons.Default.Person,
+                                                txt = it.name
+                                            )
+                                        },
+                                            onClick = {
+                                                isDebtorExpend = false
+                                                debtorId = it.debtorId
+                                                name=it.name
+                                            })
+                                    }
+
+                                } else {
+                                    items(viewModel.state.value.debtorList.sortedBy { it.name }) {
+                                        DropdownMenuItem(text = {
+                                            CustomIconText(
+                                                icon = Icons.Default.Person,
+                                                txt = it.name
+                                            )
+                                        },
+                                            onClick = {
+                                                isDebtorExpend = false
+                                                debtorId = it.debtorId
+                                                name=it.name
+
+                                            })
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+
                     OutlinedTextField(
                         readOnly = true,
                         value = date,
@@ -463,20 +577,34 @@ fun AddDebtorLone(
                             setStatusFn(false)
                             name = ""
                             amount = ""
+                            date=""
+                            debtorId=null
                         }) {
                             Text(text = "Cancel", style = Ams.getMStyle())
                         }
                         TextButton(onClick = {
+                            if (debtorId == null||amount.isEmpty()||date.isEmpty()) {
+                                Toast.makeText(
+                                    context,
+                                    "please fill all field",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                return@TextButton
+                            }
                             setStatusFn(false)
                             onClickAdd(
                                 DebtorLoan(
-                                    loneId=null,
+                                    loneId = null,
                                     amount = amount.toInt(),
-                                    loneHolder = debtorId.toInt(),
+                                    loneHolder = debtorId!!,
                                     timestamp = Ams.dateToTimeStamp(date),
                                     status = "Running"
                                 )
                             )
+                            name = ""
+                            amount = ""
+                            date=""
+                            debtorId=null
                         }) {
                             Text(text = "save", style = Ams.getMStyle())
                         }

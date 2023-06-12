@@ -4,7 +4,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.collectionmanagement.collection_book.domain.model.Debtor
 import com.example.collectionmanagement.collection_book.domain.model.DebtorLoan
 import com.example.collectionmanagement.collection_book.domain.model.LoanWithName
 import com.example.collectionmanagement.collection_book.domain.use_case.UserCases
@@ -13,7 +12,6 @@ import com.example.dailymoneyrecord.recorde_Book.domain.util.OrderType
 import com.example.dailymoneyrecord.recorde_Book.domain.util.Status
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -25,7 +23,7 @@ class LoneViewModel @Inject constructor(
 
 ) : ViewModel() {
     private val _state = mutableStateOf<LoneState>(LoneState())
-    val state: State<LoneState> = _state;
+    val state: State<LoneState> = _state
 
     var loneJob:Job?=null;
     var debtorJob:Job?=null;
@@ -141,9 +139,6 @@ class LoneViewModel @Inject constructor(
         }
     }
 
-    fun getLoneByDebtor(debtor:Debtor){
-        //Todo:
-    }
 
     fun saveUpdateLone(lone:DebtorLoan){
         viewModelScope.launch {
@@ -188,10 +183,17 @@ class LoneViewModel @Inject constructor(
 
     }
 
-    fun setOpendialog(status:Boolean) {
+    fun setOpenDialog(status:Boolean) {
         viewModelScope.launch {
             _state.value=state.value.copy(
-                openDialog = status
+                openUpdateDialog = status
+            );
+        }
+    }
+    fun setAddLoneDialog(status:Boolean) {
+        viewModelScope.launch {
+            _state.value=state.value.copy(
+                openAddDialog = status
             );
         }
     }

@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import com.example.collectionmanagement.collection_book.prentation.Daily.DailyScreen
 import com.example.collectionmanagement.collection_book.prentation.DebtorScreen
 import com.example.collectionmanagement.collection_book.prentation.Home.HomePage
 import com.example.collectionmanagement.collection_book.prentation.LoanPage
@@ -63,6 +64,21 @@ fun ComposeNavigation(){
 
         ) {
             LoanPage()
+        }
+        composable(
+            Router.DailyScreen.toString(),
+            enterTransition = {
+                slideIntoContainer(AnimatedContentScope.SlideDirection.Left, animationSpec = tween(700))
+
+            },
+            exitTransition = {
+                slideOutOfContainer(AnimatedContentScope.SlideDirection.Right, animationSpec = tween(700))
+
+            },
+
+        ) {
+            //todo: send on lone page on click payrow
+            DailyScreen()
         }
 
     }

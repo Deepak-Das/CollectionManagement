@@ -15,6 +15,7 @@ data class LoneState(
     val status:Status=Status.Running(OrderType.Descending),
     var isWarning: Boolean=false,
     val deleteLoneData: DebtorLoan? = null,
-    val openDialog:Boolean=false,
+    val openUpdateDialog:Boolean=false,
+    val openAddDialog:Boolean=false,
     val editLoanWithName:LoanWithName? =null
 )

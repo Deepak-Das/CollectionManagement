@@ -47,6 +47,9 @@ import java.util.*
 
 object Ams {
 
+    var GLOBLE_DATE: String = localDateToDate(LocalDate.now())
+    var GLOBLE_TIMSTAMP: Long = dateToTimeStamp(GLOBLE_DATE)
+
     @OptIn(ExperimentalMaterial3Api::class)
 //@Preview
     @Composable
@@ -55,7 +58,7 @@ object Ams {
         list: List<Debtor>,
         query: String = "",
         setQuery: (String) -> Unit,
-        menuDropStatus: (Status) -> Unit = {} ,
+        menuDropStatus: (Status) -> Unit = {},
         menuContent: @Composable () -> Unit = {}
 
     ) {
@@ -99,7 +102,7 @@ object Ams {
                     .background(Color.Transparent)
                     .onFocusChanged { it ->
                         isDropExpend = it.isFocused || it.hasFocus
-                        isMenuExapend=false
+                        isMenuExapend = false
                     }
                     .onGloballyPositioned {
                         searchFieldsize = it.size.toSize()
@@ -195,19 +198,19 @@ object Ams {
             }
 
             AnimatedVisibility(visible = isMenuExapend) {
-               /* Column(
-                    modifier = Modifier
-                        .heightIn(min = 100.dp, max = 150.dp)
-                        .fillMaxWidth()
-                        .background(
-                            MaterialTheme.colorScheme.surface,
-                            shape = MaterialTheme.shapes.small
-                        )
-                ) {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement =Arrangement.Center ) {
-                        Text(text = "Sort Details", style = getRStyle(color = Color.Black))
-                    }
-                }*/
+                /* Column(
+                     modifier = Modifier
+                         .heightIn(min = 100.dp, max = 150.dp)
+                         .fillMaxWidth()
+                         .background(
+                             MaterialTheme.colorScheme.surface,
+                             shape = MaterialTheme.shapes.small
+                         )
+                 ) {
+                     Row(Modifier.fillMaxWidth(), horizontalArrangement =Arrangement.Center ) {
+                         Text(text = "Sort Details", style = getRStyle(color = Color.Black))
+                     }
+                 }*/
                 menuContent()
 
             }

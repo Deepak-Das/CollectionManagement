@@ -1,19 +1,15 @@
 package com.example.collectionmanagement.collection_book.prentation.Home
 
-import android.Manifest
 import android.app.Activity
-import android.content.ContentResolver
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Environment
 import android.provider.Settings
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -38,11 +34,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
-import androidx.core.net.toFile
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.collectionmanagement.MainViewModel
 import com.example.collectionmanagement.R
 import com.example.collectionmanagement.collection_book.data.data_source.AppDatabase
 import com.example.collectionmanagement.collection_book.prentation.Home.HomeViewModel.ButtonObj
@@ -178,7 +171,7 @@ fun HomePage(
             if (homeState.isPick) {
                 ImportDbFilePopUp(viewModel)
             }
- if (homeState.isExport) {
+            if (homeState.isExport) {
                 ExportDbFilePopUp(viewModel)
             }
 
@@ -354,14 +347,14 @@ fun DatePickComp(
 @Composable
 fun ImportDbFilePopUp(
     viewModel: HomeViewModel,
-    context: Context= LocalContext.current
+    context: Context = LocalContext.current
 ) {
     var fname by remember {
         mutableStateOf("")
     }
     val selectedFile = remember { mutableStateOf<String?>(null) }
 
-    var backUri:Uri?=null
+    var backUri: Uri? = null
 
     val filePickerLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -369,8 +362,8 @@ fun ImportDbFilePopUp(
 
             CoroutineScope(Dispatchers.IO).launch {
                 selectedFile.value = uri.toString()
-                fname=File(uri?.path).name
-                backUri=uri
+                fname = File(uri?.path).name
+                backUri = uri
 
 
             }
@@ -393,11 +386,12 @@ fun ImportDbFilePopUp(
                     readOnly = true,
                     onValueChange = {},
                     trailingIcon = {
-                              Icon(modifier = Modifier.clickable {
-                                  scope.launch {
-                                      filePickerLauncher.launch("*/*")
-                                  }
-                                  println("click") },imageVector = Icons.Default.FileOpen, contentDescription = "")
+                        Icon(modifier = Modifier.clickable {
+                            scope.launch {
+                                filePickerLauncher.launch("*/*")
+                            }
+                            println("click")
+                        }, imageVector = Icons.Default.FileOpen, contentDescription = "")
                     },
 
 
@@ -407,9 +401,12 @@ fun ImportDbFilePopUp(
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 10.dp), horizontalArrangement = Arrangement.End){
-                Button(onClick = { if(backUri!=null){
-                    viewModel.importDb(context,ComponentActivity(),backUri!!)}
+                    .padding(horizontal = 10.dp), horizontalArrangement = Arrangement.End
+            ) {
+                Button(onClick = {
+                    if (backUri != null) {
+                        viewModel.importDb(context, ComponentActivity(), backUri!!)
+                    }
                 }) {
                     Text(text = "import")
                 }
@@ -431,21 +428,20 @@ fun ExportDbFilePopUp(
     }
     val selectedLocation = remember { mutableStateOf<String?>(null) }
 
-    var file: File= context.getDatabasePath(AppDatabase.DATABASE_NAME)
+    var file: File = context.getDatabasePath(AppDatabase.DATABASE_NAME)
 
-   fname="${file.name}_${Ams.timeStampToDate(viewModel.state.value.timeStamp)}"
+    fname = "${file.name}_${Ams.timeStampToDate(viewModel.state.value.timeStamp)}"
 
-    var openFileDir= rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()){ uri ->
-        println(uri.toString())
+    var openFileDir =
+        rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
+            println(uri.toString())
 
-    }
-
-
+        }
 
 
     var scope = rememberCoroutineScope()
     AlertDialog(onDismissRequest = { viewModel.setIsExport(false) }) {
-        Card() {
+        Card {
             Column(
                 modifier = Modifier.padding(10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -455,11 +451,11 @@ fun ExportDbFilePopUp(
                 Text("Save DB Backup ", style = MaterialTheme.typography.bodyLarge)
                 Spacer(modifier = Modifier.height(10.dp))
                 OutlinedTextField(
-                    label={Text("Edit file name")},
+                    label = { Text("Edit file name") },
                     value = fname,
                     onValueChange = {},
                     trailingIcon = {
-                              Icon(imageVector = Icons.Default.FileOpen, contentDescription = "")
+                        Icon(imageVector = Icons.Default.FileOpen, contentDescription = "")
                     },
 
 
@@ -467,20 +463,25 @@ fun ExportDbFilePopUp(
             }
             Spacer(modifier = Modifier.height(10.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                Text("the file will be save in documents directory", overflow = TextOverflow.Visible, style = MaterialTheme.typography.bodySmall.copy(color = Color.Red))
+                Text(
+                    "the file will be save in documents directory",
+                    overflow = TextOverflow.Visible,
+                    style = MaterialTheme.typography.bodySmall.copy(color = Color.Red)
+                )
 
             }
             Spacer(modifier = Modifier.height(10.dp))
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 10.dp), horizontalArrangement = Arrangement.End) {
+                    .padding(horizontal = 10.dp), horizontalArrangement = Arrangement.End
+            ) {
 
 
                 Button(onClick = {
 
                     viewModel.setIsExport(false)
-                    viewModel.exportDb(context,fname)
+                    viewModel.exportDb(context, fname)
 
 
                 }) {
@@ -494,11 +495,10 @@ fun ExportDbFilePopUp(
 }
 
 
-
-fun Activity.goToSetting(){
+fun Activity.goToSetting() {
 
     Intent(
         Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-        Uri.fromParts("package",packageName,null)
+        Uri.fromParts("package", packageName, null)
     ).also(::startActivity)
 }

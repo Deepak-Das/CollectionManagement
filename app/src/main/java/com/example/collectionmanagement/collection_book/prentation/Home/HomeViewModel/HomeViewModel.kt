@@ -21,6 +21,7 @@ import com.example.collectionmanagement.collection_book.prentation.navigation.Ro
 import com.example.collectionmanagement.collection_book.prentation.theme.dailyColor
 import com.example.collectionmanagement.collection_book.prentation.theme.debtorColor
 import com.example.collectionmanagement.collection_book.prentation.theme.loneColor
+import com.example.collectionmanagement.collection_book.prentation.utils.Ams
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -163,10 +164,14 @@ class HomeViewModel @Inject constructor(
     }
 
     fun setHomeDateAndTimeStamp(timeStamp: Long, date: String) {
-        _state.value = state.value.copy(
-            timeStamp = timeStamp,
-            date = date
-        )
+       viewModelScope.launch {
+           _state.value = state.value.copy(
+               timeStamp = timeStamp,
+               date = date
+           )
+           Ams.GLOBLE_DATE=date
+           Ams.GLOBLE_TIMSTAMP=timeStamp
+       }
     }
     fun setIsPick(status:Boolean) {
         viewModelScope.launch {
