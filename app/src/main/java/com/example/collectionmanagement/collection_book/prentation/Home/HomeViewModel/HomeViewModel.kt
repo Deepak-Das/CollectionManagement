@@ -1,18 +1,18 @@
 package com.example.collectionmanagement.collection_book.prentation.Home.HomeViewModel
 
-import android.content.ComponentName
-import android.content.ContentResolver
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Environment
 import android.os.Process
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.FileProvider
+import androidx.core.net.toFile
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.collectionmanagement.R
@@ -26,8 +26,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
-import java.io.FileNotFoundException
 import java.io.FileOutputStream
+import java.sql.Date
+import java.text.SimpleDateFormat
 import javax.inject.Inject
 
 @HiltViewModel
@@ -50,19 +51,16 @@ class HomeViewModel @Inject constructor(
     val state: State<HomeState> = _state;
 
 
-    fun exportDb(context: Context,fileName:String) {
+    fun exportDb(context: Context, fileName: String, selectedUri: Uri?) {
 
-//        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
         setProgress(true);
-       /* val backupDir =
-            File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "MyDatabaseBackup")
-        println(backupDir.absolutePath)*/
 
-        val backupDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "MyDatabaseBackup")
 
-            if(!backupDir.exists()){
-               backupDir.mkdirs()
-            }
+
+
+        var backupDir = File(Environment.getExternalStorageDirectory(), "MyDatabaseBackup")
+
+
 
 
         viewModelScope.launch {
@@ -72,6 +70,7 @@ class HomeViewModel @Inject constructor(
             dbFile.copyTo(backupFile, true)
 
             Toast.makeText(context, "Successful backup Db", Toast.LENGTH_SHORT).show()
+
 
             setProgress(false);
         }
@@ -127,6 +126,97 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+
+   /* fun getPays() {
+        job2?.cancel()
+        job2 = useCase.getAllPayments().onEach {
+            _homeState.value = homesate.value.copy(
+                listpay = it
+            )
+        }.launchIn(viewModelScope)
+    }
+
+    fun csvGenerate(mContext: Context) {
+        viewModelScope.launch {
+            state.value = state.value.copy(
+                loanList = mutableListOf(),
+                paysList = mutableListOf()
+            )
+
+            var file_name =
+                "Backup_" + SimpleDateFormat("dd-MM-yy").format(Date(System.currentTimeMillis()))
+                    .toString() + ".csv"
+
+            pathCSV = mContext.getExternalFilesDir(null)!!.absolutePath + "/Backup_CSV"
+            val dir = File(pathCSV)
+            if (!dir.exists()) {
+                dir.mkdir()
+            }
+            homesate.value.listloans.onEachIndexed { index, it ->
+                homesate.value.loanList.add(
+                    listOf(
+                        (index + 1).toString(),
+                        it.DebtorName,
+                        it.LoneAmount.toString(),
+                        SimpleDateFormat("dd-MM-yyyy").format(it.timeStamp),
+                        it.status
+                    )
+                )
+            }
+//            Log.i(TAG, "csvLoan: ${homesate.value.listloans.toString()}")
+            val file = File(pathCSV, file_name)
+
+            csvWriter().open(file) {
+                writeRow("", "", "LOAN_RECORD", "", "")
+                writeRow("")
+                writeRow(listOf("SL NO.", "Name", "Loan_Amount", "Date", "Status"))
+                writeRows(homesate.value.loanList)
+                writeRow("")
+            }
+
+            homesate.value.listpay.onEachIndexed { index, it ->
+                homesate.value.paysList.add(
+                    listOf(
+                        (index + 1).toString(),
+                        it.debtorName,
+                        it.amount.toString(),
+                        SimpleDateFormat("dd-MM-yyyy").format(it.timeStamp)
+                    )
+                )
+//                Log.i(TAG, "csvGenerate: ${homesate.value.paysList[0].toString()}")
+            }
+
+//            Log.i(TAG, "csvGenerate: ${homesate.value.listpay}")
+
+
+            csvWriter().open(file, true) {
+                writeRow("", "", "PAYMENTS_RECORD", "", "")
+                writeRow("")
+                writeRow(listOf("SL NO.", "Name", "Pay_Amount", "Date"))
+                writeRows(homesate.value.paysList)
+            }
+
+
+            Toast.makeText(mContext, "Successful write", Toast.LENGTH_SHORT).show()
+
+
+            val intent = Intent(Intent.ACTION_VIEW);
+            intent.data = FileProvider.getUriForFile(
+                mContext,
+                mContext.packageName.toString() + ".provider",
+                file
+            )
+            intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            delay(500)
+            try {
+                mContext.startActivity(intent)
+            } catch (e: ActivityNotFoundException) {
+                Log.i("App_Tag", "Exception - " + e.message)
+            }
+        }
+    }*/
+
+
     fun contentUriToFile(context: Context, contentUri: Uri): File? {
         val contentResolver: ContentResolver = context.contentResolver
         val inputStream = contentResolver.openInputStream(contentUri) ?: return null
@@ -142,6 +232,9 @@ class HomeViewModel @Inject constructor(
 
         return tempFile
     }
+
+
+
 
     private fun closeApp(activity: ComponentActivity) {
         activity.finishAffinity()

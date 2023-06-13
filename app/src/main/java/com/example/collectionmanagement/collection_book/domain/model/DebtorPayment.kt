@@ -23,3 +23,11 @@ data class DebtorWithPayments(
     val payments: List<DebtorPayment>
 )
 
+data class DailyPayment(
+    val debtorName:String,
+    val amount:Int,
+    val paymentId:Int,
+    val debtorId:Int,
+    val timeStamp:Long,
+    val color:Int
+)

@@ -5,9 +5,14 @@ import androidx.room.Room
 import com.example.collectionmanagement.collection_book.data.data_source.AppDatabase
 import com.example.collectionmanagement.collection_book.data.repositoryImp.DebtorLoneImp
 import com.example.collectionmanagement.collection_book.data.repositoryImp.DebtorRepoImp
+import com.example.collectionmanagement.collection_book.data.repositoryImp.PaymentRepositoryImp
 import com.example.collectionmanagement.collection_book.domain.repository.DebtorLoneRepository
 import com.example.collectionmanagement.collection_book.domain.repository.DebtorRepository
+import com.example.collectionmanagement.collection_book.domain.repository.PaymentRepository
 import com.example.collectionmanagement.collection_book.domain.use_case.*
+import com.example.dailymoneyrecord.recorde_Book.domain.use_case.cases.DeletePayment
+import com.example.dailymoneyrecord.recorde_Book.domain.use_case.cases.GetAllPayments
+import com.example.dailymoneyrecord.recorde_Book.domain.use_case.cases.GetDailyPayments
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,7 +29,7 @@ object AppModule {
     fun getDebtorRepo(database: AppDatabase): DebtorRepository {
         return DebtorRepoImp(database.dao);
     }
- @Provides
+    @Provides
     @Singleton
     fun getDebtorLoneRepo(database: AppDatabase): DebtorLoneRepository {
         return DebtorLoneImp(database.dao);
@@ -32,9 +37,16 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun getPaymentRepo(database: AppDatabase): PaymentRepository {
+        return PaymentRepositoryImp(database.dao);
+    }
+
+    @Provides
+    @Singleton
     fun getUseCase(
         debtorRepository: DebtorRepository,
         debtorLoneRepository: DebtorLoneRepository,
+        paymentRepository: PaymentRepository
     ): UserCases {
         return UserCases(
             getAllDebtor = GetAllDebtor(debtorRepository),
@@ -42,7 +54,13 @@ object AppModule {
             deleteDebtor = DeleteDebtor(debtorRepository ),
             getAllLone= GetAllLone(debtorLoneRepository),
             saveUpdateLone = SaveLone(debtorLoneRepository),
-            deleteLone = DeleteLone(debtorLoneRepository)
+            deleteLone = DeleteLone(debtorLoneRepository),
+            saveUpdatePayment = SaveUpdatePayment(paymentRepository),
+            deletePayment= DeletePayment(paymentRepository),
+            dailyPayment = GetDailyPayments(paymentRepository),
+            allPayments = GetAllPayments(paymentRepository),
+            paymentsByIdAndTime = GetPaymentsByIdAndTime(paymentRepository)
+
         )
     }
 

@@ -58,6 +58,7 @@ class MainActivity : ComponentActivity() {
                                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
                                 Manifest.permission.READ_EXTERNAL_STORAGE,
 
+
                                 )
                         )
                     })
@@ -68,7 +69,6 @@ class MainActivity : ComponentActivity() {
                             permissionTextProvider = when (permission) {
                                 Manifest.permission.READ_EXTERNAL_STORAGE -> ReadStorageTextProvider()
                                 Manifest.permission.WRITE_EXTERNAL_STORAGE -> WriteStorageTextProvider()
-                                Manifest.permission.MANAGE_EXTERNAL_STORAGE -> MangeStorageTextProvider()
                                 else -> return@forEach
                             },
                             isPermanentDeclined = !shouldShowRequestPermissionRationale(permission),
@@ -79,7 +79,7 @@ class MainActivity : ComponentActivity() {
                                     arrayOf(
                                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
                                         Manifest.permission.READ_EXTERNAL_STORAGE,
-                                    )
+                                            )
                                 )
                             })
                     }
