@@ -1,5 +1,6 @@
 package com.example.collectionmanagement.collection_book.prentation.Daily
 
+import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -86,6 +87,7 @@ class DailyViewModel @Inject constructor(
     }
 
     fun saveUpdatePay(payObj: DebtorPayment) {
+
         viewModelScope.launch {
             useCases.saveUpdatePayment(payObj)
         }

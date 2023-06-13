@@ -3,6 +3,7 @@ package com.example.collectionmanagement.collection_book.prentation.Daily
 import android.content.ContentValues
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -302,7 +303,12 @@ fun BottomBarBox(
                                   amount=amount.toInt(),
                                   timestamp = viewModel.state.value.timeStamp
                               )
-                              viewModel.saveUpdatePay(savePay)
+                              if(savePay.amount.toString().isEmpty()||savePay.paymentHolder==null){
+                                   viewModel.saveUpdatePay(savePay)
+
+                                   Toast.makeText(context,"All field required",Toast.LENGTH_SHORT)
+                                   return@launch
+                              }
                               name=""
                               debtorId=null
                               amount=""
