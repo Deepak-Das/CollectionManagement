@@ -1,18 +1,16 @@
 package com.example.collectionmanagement.collection_book.prentation.Daily
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.collectionmanagement.collection_book.domain.model.DailyPayment
 import com.example.collectionmanagement.collection_book.domain.model.DebtorPayment
 import com.example.collectionmanagement.collection_book.domain.use_case.UserCases
-import com.example.collectionmanagement.collection_book.prentation.Loan.LoneState
 import com.example.dailymoneyrecord.recorde_Book.domain.util.OrderBy
 import com.example.dailymoneyrecord.recorde_Book.domain.util.OrderType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -54,11 +52,6 @@ class DailyViewModel @Inject constructor(
        }.launchIn(viewModelScope)
    }
 
-    fun SaveUpdatePays(debtorPayment: DebtorPayment){
-        viewModelScope.launch {
-            useCases.saveUpdatePayment(debtorPayment)
-        }
-    }
 
     fun setDate(timeStamp: Long,date: String) {
         viewModelScope.launch {
@@ -74,6 +67,42 @@ class DailyViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = state.value.copy(
                 timeStamp = timeStamp
+            )
+        }
+    } fun setIsFilter(value: Boolean) {
+        viewModelScope.launch {
+            _state.value = state.value.copy(
+                isFilter = value
+            )
+        }
+    }
+    fun setOrderBy(orderBy: OrderBy) {
+        viewModelScope.launch {
+            _state.value = state.value.copy(
+                orderBy = orderBy
+            )
+            getDailypay()
+        }
+    }
+
+    fun saveUpdatePay(payObj: DebtorPayment) {
+        viewModelScope.launch {
+            useCases.saveUpdatePayment(payObj)
+        }
+    }
+
+    fun setEditPay(dailyPayment: DailyPayment) {
+        viewModelScope.launch {
+            _state.value = state.value.copy(
+                editPayment = dailyPayment
+            )
+        }
+    }
+
+    fun deletePay(payment: DebtorPayment) {
+        viewModelScope.launch {
+            _state.value = state.value.copy(
+                deletePayment = payment
             )
         }
     }

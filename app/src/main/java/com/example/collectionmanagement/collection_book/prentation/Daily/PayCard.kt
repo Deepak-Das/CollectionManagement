@@ -21,8 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.collectionmanagement.R
-import com.example.collectionmanagement.collection_book.domain.model.DebtorLoan
-import com.example.collectionmanagement.collection_book.domain.model.LoanWithName
+import com.example.collectionmanagement.collection_book.prentation.theme.option2
 import com.example.collectionmanagement.collection_book.prentation.utils.Ams
 import java.util.*
 
@@ -30,11 +29,12 @@ import java.util.*
 @Composable
 fun DebtorPayCard(
     dailyPayment: DailyPayment,
-    editLone: (DebtorPayment) -> Unit,
+    editLone: (DailyPayment) -> Unit,
     onClickDelete: (DebtorPayment) -> Unit,
+    onClickAddLoan: (DebtorPayment) -> Unit,
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().height(intrinsicSize = IntrinsicSize.Min),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
@@ -57,7 +57,7 @@ fun DebtorPayCard(
                 Box(
                     modifier = Modifier
                         .width(6.dp)
-                        .height(100.dp)
+                        .height(80.dp)
                         .background(
                             color = Color(dailyPayment.color),
                             shape = MaterialTheme.shapes.medium
@@ -69,7 +69,7 @@ fun DebtorPayCard(
                     Row(
                         Modifier
                             .fillMaxWidth()
-                            .height(20.dp),
+                            .height(intrinsicSize = IntrinsicSize.Min),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -78,127 +78,160 @@ fun DebtorPayCard(
                     }
                     Spacer(modifier = Modifier.size(10.dp))
                     CustomIconText(
-                        icon = Icons.Default.DateRange,
-                        txt = Ams.timeStampToDate(timeStamp = dailyPayment.timeStamp)
+                        icon = Icons.Default.Money,
+                        txt = dailyPayment.amount.toString()
                     )
+
                     Spacer(modifier = Modifier.size(10.dp))
+
+
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        CustomIconText(
-                            icon = Icons.Default.Money,
-                            txt = dailyPayment.amount.toString()
-                        )
                         Box(
-                            modifier = Modifier.align(alignment = Alignment.Bottom),
+                            Modifier
+                                .background(
+                                    color = MaterialTheme.colorScheme.error,
+                                    shape = MaterialTheme.shapes.medium
+                                )
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                                .align(alignment = Alignment.Bottom)
+                                .zIndex(2f)
+                                .clickable {
+                                    var dp = DebtorPayment(
+                                        paymentId = dailyPayment.paymentId,
+                                        paymentHolder  = dailyPayment.debtorId,
+                                        amount = dailyPayment.amount,
+                                        timestamp = dailyPayment.timeStamp,
+                                    )
+                                    onClickDelete(dp)
+                                },
                             contentAlignment = Alignment.Center
                         ) {
-                            Row(
-                                horizontalArrangement = Arrangement.SpaceAround,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Box(
-                                    Modifier
-                                        .background(
-                                            color = MaterialTheme.colorScheme.error,
-                                            shape = MaterialTheme.shapes.medium
-                                        )
-                                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                                        .align(alignment = Alignment.Bottom)
-                                        .zIndex(2f)
-                                        .clickable {
-                                            var dp = DebtorPayment(
-                                                paymentId = dailyPayment.paymentId,
-                                                paymentHolder  = dailyPayment.debtorId,
-                                                amount = dailyPayment.amount,
-                                                timestamp = dailyPayment.timeStamp,
-                                            )
-                                            onClickDelete(dp)
-                                        },
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.edit),
-                                            contentDescription = null,
-                                            Modifier.size(15.dp)
-                                        )
-                                        Spacer(
-                                            modifier = Modifier.size(
-                                                width = 5.dp,
-                                                height = 0.dp
-                                            )
-                                        )
-                                        Text(
-                                            text = "Delete",
-                                            style = Ams.getMStyle(
-                                                color = Color.White,
-                                                fontSize = 10.sp
-                                            )
-                                        )
-                                        Spacer(
-                                            modifier = Modifier.size(
-                                                width = 10.dp,
-                                                height = 0.dp
-                                            )
-                                        )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.edit),
+                                    contentDescription = null,
+                                    Modifier.size(15.dp)
+                                )
+                                Spacer(
+                                    modifier = Modifier.size(
+                                        width = 5.dp,
+                                        height = 0.dp
+                                    )
+                                )
+                                Text(
+                                    text = "Delete",
+                                    style = Ams.getMStyle(
+                                        color = Color.White,
+                                        fontSize = 10.sp
+                                    )
+                                )
+                                Spacer(
+                                    modifier = Modifier.size(
+                                        width = 10.dp,
+                                        height = 0.dp
+                                    )
+                                )
 
 
-                                    }
-                                }
+                            }
+                        }
 
-                                Spacer(modifier = Modifier.size(10.dp))
 
-                                Box(
-                                    Modifier
-                                        .background(
-                                            color = MaterialTheme.colorScheme.primary,
-                                            shape = MaterialTheme.shapes.medium
-                                        )
-                                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                                        .align(alignment = Alignment.Bottom)
-                                        .zIndex(2f)
-                                        .clickable {
-                                            var dp = DebtorPayment(
-                                                paymentId = dailyPayment.paymentId,
-                                                paymentHolder  = dailyPayment.debtorId,
-                                                amount = dailyPayment.amount,
-                                                timestamp = dailyPayment.timeStamp,
-                                            )
-                                            editLone(dp)
-                                        },
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.edit),
-                                            contentDescription = null,
-                                            Modifier.size(15.dp)
-                                        )
-                                        Spacer(
-                                            modifier = Modifier.size(
-                                                width = 5.dp,
-                                                height = 0.dp
-                                            )
-                                        )
-                                        Text(
-                                            text = "Edit",
-                                            style = Ams.getMStyle(
-                                                color = Color.White,
-                                                fontSize = 10.sp
-                                            )
-                                        )
-                                        Spacer(
-                                            modifier = Modifier.size(
-                                                width = 5.dp,
-                                                height = 0.dp
-                                            )
-                                        )
 
-                                    }
-                                }
+                        Box(
+                            Modifier
+                                .background(
+                                    color = MaterialTheme.colorScheme.primary,
+                                    shape = MaterialTheme.shapes.medium
+                                )
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                                .align(alignment = Alignment.Bottom)
+                                .zIndex(2f)
+                                .clickable {
+
+                                    editLone(dailyPayment)
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.edit),
+                                    contentDescription = null,
+                                    Modifier.size(15.dp)
+                                )
+                                Spacer(
+                                    modifier = Modifier.size(
+                                        width = 5.dp,
+                                        height = 0.dp
+                                    )
+                                )
+                                Text(
+                                    text = "Edit",
+                                    style = Ams.getMStyle(
+                                        color = Color.White,
+                                        fontSize = 10.sp
+                                    )
+                                )
+                                Spacer(
+                                    modifier = Modifier.size(
+                                        width = 5.dp,
+                                        height = 0.dp
+                                    )
+                                )
+
+                            }
+                        }
+
+                        Box(
+                            Modifier
+                                .background(
+                                    color = option2,
+                                    shape = MaterialTheme.shapes.medium
+                                )
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                                .align(alignment = Alignment.Bottom)
+                                .zIndex(2f)
+                                .clickable {
+                                    var dp = DebtorPayment(
+                                        paymentId = dailyPayment.paymentId,
+                                        paymentHolder  = dailyPayment.debtorId,
+                                        amount = dailyPayment.amount,
+                                        timestamp = dailyPayment.timeStamp,
+                                    )
+                                    onClickAddLoan(dp)
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.edit),
+                                    contentDescription = null,
+                                    Modifier.size(15.dp)
+                                )
+                                Spacer(
+                                    modifier = Modifier.size(
+                                        width = 5.dp,
+                                        height = 0.dp
+                                    )
+                                )
+                                Text(
+                                    text = "AddLone",
+                                    style = Ams.getMStyle(
+                                        color = Color.White,
+                                        fontSize = 10.sp
+                                    )
+                                )
+                                Spacer(
+                                    modifier = Modifier.size(
+                                        width = 5.dp,
+                                        height = 0.dp
+                                    )
+                                )
+
                             }
                         }
                     }

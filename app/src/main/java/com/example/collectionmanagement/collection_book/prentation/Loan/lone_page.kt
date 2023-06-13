@@ -232,20 +232,20 @@ private fun LoanHeaderBox(
                     .padding(horizontal = 10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                RadioButtonText(
-                    radioStatus = Status.Running(state.status.orderType),
+                Ams.RadioButtonText(
+                    radioObj = Status.Running(state.status.orderType),
                     selected = state.status is Status.Running,
                     text = "Running",
                     onClickRadio = viewModel::setStatus
                 )
-                RadioButtonText(
-                    radioStatus = Status.Paid(state.status.orderType),
+                Ams.RadioButtonText(
+                    radioObj = Status.Paid(state.status.orderType),
                     selected = state.status is Status.Paid,
                     text = "Paid",
                     onClickRadio = viewModel::setStatus
                 )
-                RadioButtonText(
-                    radioStatus = Status.All(state.status.orderType),
+                Ams.RadioButtonText(
+                    radioObj = Status.All(state.status.orderType),
                     selected = state.status is Status.All,
                     text = "All",
                     onClickRadio = viewModel::setStatus
@@ -259,14 +259,14 @@ private fun LoanHeaderBox(
                     .padding(horizontal = 10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                RadioButtonText(
-                    radioStatus = state.status.copy(OrderType.Descending),
+                Ams.RadioButtonText(
+                    radioObj = state.status.copy(OrderType.Descending),
                     selected = state.status.orderType is OrderType.Descending,
                     text = "Descending",
                     onClickRadio = viewModel::setStatus
                 )
-                RadioButtonText(
-                    radioStatus = state.status.copy(OrderType.Ascending),
+                Ams.RadioButtonText(
+                    radioObj = state.status.copy(OrderType.Ascending),
                     selected = state.status.orderType is OrderType.Ascending,
                     text = "Ascending",
                     onClickRadio = viewModel::setStatus
@@ -619,21 +619,6 @@ fun AddDebtorLone(
 }
 
 
-@Composable
-fun RadioButtonText(
-    selected: Boolean,
-    radioStatus: Status,
-    onClickRadio: (Status) -> Unit,
-    text: String
-) {
-
-
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        RadioButton(selected = selected, onClick = { onClickRadio(radioStatus) })
-        Spacer(modifier = Modifier.width(5.dp))
-        Text(text, style = Ams.getBStyle(fontSize = 18.sp))
-    }
-}
 
 
 

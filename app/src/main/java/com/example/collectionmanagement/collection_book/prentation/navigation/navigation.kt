@@ -19,7 +19,9 @@ enum class Router{
     HomeScreen,
     DebtorScreen,
     DailyScreen,
-    LoneScreen
+    LoneScreen,
+    PaymentByIdScreen,
+    PaymentByLimit,
 
 }
 
@@ -78,7 +80,7 @@ fun ComposeNavigation(){
 
         ) {
             //todo: send on lone page on click payrow
-            DailyScreen()
+            DailyScreen(navHostController = navController)
         }
 
     }

@@ -281,6 +281,23 @@ object Ams {
         }
     }
 
+    @Composable
+    fun <T> RadioButtonText(
+        selected: Boolean,
+        radioObj: T,
+        onClickRadio: (T) -> Unit,
+        text: String
+    ) {
+
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            RadioButton(selected = selected, onClick = { onClickRadio(radioObj) })
+            Spacer(modifier = Modifier.width(5.dp))
+            Text(text, style = Ams.getBStyle(fontSize = 18.sp))
+        }
+    }
+
+
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun CalenderPop(
