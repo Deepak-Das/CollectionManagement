@@ -24,6 +24,8 @@ interface AppDoa {
     //Lone
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveLone(lone: DebtorLoan)
+ @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun saveAllLone(loans: List<DebtorLoan>)
 
     @Delete
     suspend fun deleteLone(debtorLoan: DebtorLoan)
@@ -32,8 +34,8 @@ interface AppDoa {
     fun getAllDebtorLoans(): Flow<List<LoanWithName>>
 
 
-    @Query("SELECT L.loneId as loanId,D.debtorId as debtorId ,D.name as DebtorName, L.amount as LoneAmount , L.timestamp as timeStamp, D.color as color,L.status as status FROM DebtorLoan as L INNER JOIN Debtor as D WHERE L.loneHolder== D.debtorId AND D.debtorId==:id ")
-    fun getLoanByDebtorId(id: Int): Flow<List<LoanWithName>>
+    @Query("SELECT * FROM DebtorLoan  WHERE loneHolder==:id AND status==:status ")
+    fun getLoanByDebtorId(id: Int,status:String = "Running"): Flow<List<DebtorLoan>>
 
 
 

@@ -29,9 +29,10 @@ import java.util.*
 @Composable
 fun DebtorPayCard(
     dailyPayment: DailyPayment,
-    editLone: (DailyPayment) -> Unit,
+    onEditClick: (DailyPayment) -> Unit,
     onClickDelete: (DebtorPayment) -> Unit,
-    onClickAddLoan: (DebtorPayment) -> Unit,
+    onClickAddLoan: (DailyPayment) -> Unit,
+    onSetAllClick: (DebtorPayment) -> Unit,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth().height(intrinsicSize = IntrinsicSize.Min),
@@ -75,6 +76,55 @@ fun DebtorPayCard(
                     ) {
                         CustomIconText(icon = Icons.Default.Person, txt = dailyPayment.debtorName)
                         //todo: add Loan
+                        Box(
+                            Modifier
+                                .background(
+                                    color = MaterialTheme.colorScheme.inversePrimary,
+                                    shape = MaterialTheme.shapes.medium
+                                )
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                                .align(alignment = Alignment.Bottom)
+                                .zIndex(2f)
+                                .clickable {
+                                    var dp = DebtorPayment(
+                                        paymentId = dailyPayment.paymentId,
+                                        paymentHolder  = dailyPayment.debtorId,
+                                        amount = dailyPayment.amount,
+                                        timestamp = dailyPayment.timeStamp,
+                                    )
+                                    onSetAllClick(dp)
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.edit),
+                                    contentDescription = null,
+                                    Modifier.size(15.dp)
+                                )
+                                Spacer(
+                                    modifier = Modifier.size(
+                                        width = 5.dp,
+                                        height = 0.dp
+                                    )
+                                )
+                                Text(
+                                    text = "setAllPaid",
+                                    style = Ams.getMStyle(
+                                        color = Color.White,
+                                        fontSize = 10.sp
+                                    )
+                                )
+                                Spacer(
+                                    modifier = Modifier.size(
+                                        width = 10.dp,
+                                        height = 0.dp
+                                    )
+                                )
+
+
+                            }
+                        }
                     }
                     Spacer(modifier = Modifier.size(10.dp))
                     CustomIconText(
@@ -153,7 +203,7 @@ fun DebtorPayCard(
                                 .zIndex(2f)
                                 .clickable {
 
-                                    editLone(dailyPayment)
+                                    onEditClick(dailyPayment)
                                 },
                             contentAlignment = Alignment.Center
                         ) {
@@ -196,13 +246,13 @@ fun DebtorPayCard(
                                 .align(alignment = Alignment.Bottom)
                                 .zIndex(2f)
                                 .clickable {
-                                    var dp = DebtorPayment(
+                                    /*var dp = DebtorPayment(
                                         paymentId = dailyPayment.paymentId,
                                         paymentHolder  = dailyPayment.debtorId,
                                         amount = dailyPayment.amount,
                                         timestamp = dailyPayment.timeStamp,
-                                    )
-                                    onClickAddLoan(dp)
+                                    )*/
+                                    onClickAddLoan(dailyPayment)
                                 },
                             contentAlignment = Alignment.Center
                         ) {

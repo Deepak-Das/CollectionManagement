@@ -12,6 +12,8 @@ class UserCases @Inject constructor(
     val saveUpdateDebtor: SaveUpdateDebtor,
     val deleteDebtor: DeleteDebtor,
     val getAllLone: GetAllLone,
+    val getAllLoneById: GetAllLoneById,
+    val saveAllLone: SaveAllLone,
     val saveUpdateLone: SaveLone,
     val deleteLone: DeleteLone,
     val saveUpdatePayment: SaveUpdatePayment,

@@ -1,11 +1,13 @@
 package com.example.collectionmanagement.collection_book.prentation.Daily
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.collectionmanagement.collection_book.domain.model.DailyPayment
+import com.example.collectionmanagement.collection_book.domain.model.DebtorLoan
 import com.example.collectionmanagement.collection_book.domain.model.DebtorPayment
 import com.example.collectionmanagement.collection_book.domain.use_case.UserCases
 import com.example.dailymoneyrecord.recorde_Book.domain.util.OrderBy
@@ -27,11 +29,12 @@ class DailyViewModel @Inject constructor(
 
     var debtorJob: Job?=null
     var paymentJob: Job?=null
+    var loanJob: Job?=null
 
     init {
         viewModelScope.launch {
             getAllDebtor()
-            getDailypay()
+            getDailyPay()
         }
     }
 
@@ -44,7 +47,7 @@ class DailyViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-   fun  getDailypay(){
+   fun  getDailyPay(){
        paymentJob?.cancel()
        paymentJob=useCases.dailyPayment(state.value.timeStamp,state.value.orderBy).onEach {
            _state.value = state.value.copy(
@@ -60,7 +63,7 @@ class DailyViewModel @Inject constructor(
                 date = date,
                 timeStamp = timeStamp
             )
-            getDailypay()
+            getDailyPay()
         }
     }
 
@@ -82,11 +85,12 @@ class DailyViewModel @Inject constructor(
             _state.value = state.value.copy(
                 orderBy = orderBy
             )
-            getDailypay()
+            getDailyPay()
         }
     }
 
     fun saveUpdatePay(payObj: DebtorPayment) {
+
 
         viewModelScope.launch {
             useCases.saveUpdatePayment(payObj)
@@ -106,8 +110,91 @@ class DailyViewModel @Inject constructor(
             _state.value = state.value.copy(
                 deletePayment = payment
             )
+            useCases.deletePayment(payment)
         }
     }
+
+    fun setIsDebtorExpended(value: Boolean) {
+        viewModelScope.launch {
+            _state.value = state.value.copy(
+                isDebtorExpend=value
+            )
+        }
+    }
+
+    fun setHasFocus(value: Boolean) {
+        viewModelScope.launch {
+            _state.value = state.value.copy(
+                hasFocus = value
+            )
+        }
+    }
+
+    fun setIsAddLone(value: Boolean) {
+        viewModelScope.launch {
+            _state.value = state.value.copy(
+                isAddLone=value
+
+            )
+        }
+    }
+
+    fun setLoneDebtor(dailyDebtor:DailyPayment) {
+        viewModelScope.launch {
+            _state.value = state.value.copy(
+                dailyLoneDebtor=dailyDebtor
+            )
+        }
+    }
+
+    fun saveLoan(loan: DebtorLoan) {
+        viewModelScope.launch {
+            useCases.saveUpdateLone(loan)
+        }
+    }
+    fun setIsWarning(value: Boolean) {
+        viewModelScope.launch {
+            _state.value = state.value.copy(
+                isWaring=value,
+            )
+        }
+    }
+    fun setDpl(dpl:DebtorPayment) {
+        viewModelScope.launch {
+            _state.value = state.value.copy(
+                dpl = dpl
+            )
+        }
+    }
+
+    suspend fun setAllPaid(dp: DebtorPayment?,context: Context) {
+
+        println(dp.toString())
+
+        loanJob?.cancel()
+        loanJob= useCases.getAllLoneById(dp?.paymentHolder?:0).onEach {
+           /* it.forEach {
+                println(it.toString())
+            }*/
+            val toList = it.map {
+                it.copy(status = "Paid")
+            }.toList()
+
+            if(toList.isNotEmpty()){
+                useCases.saveAllLone(toList)
+            }else{
+                Toast.makeText(context,"No pending loan!!",Toast.LENGTH_SHORT)
+            }
+
+            _state.value=state.value.copy(
+                isWaring = false
+            )
+
+
+        }.launchIn(viewModelScope)
+    }
+
 }
+
 
 

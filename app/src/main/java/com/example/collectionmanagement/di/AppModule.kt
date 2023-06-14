@@ -59,7 +59,9 @@ object AppModule {
             deletePayment= DeletePayment(paymentRepository),
             dailyPayment = GetDailyPayments(paymentRepository),
             allPayments = GetAllPayments(paymentRepository),
-            paymentsByIdAndTime = GetPaymentsByIdAndTime(paymentRepository)
+            paymentsByIdAndTime = GetPaymentsByIdAndTime(paymentRepository),
+            getAllLoneById = GetAllLoneById(debtorLoneRepository),
+            saveAllLone = SaveAllLone(debtorLoneRepository)
 
         )
     }

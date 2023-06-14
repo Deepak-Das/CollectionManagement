@@ -12,6 +12,14 @@ class DebtorLoneImp @Inject constructor (private val appDoa: AppDoa): DebtorLone
         appDoa.saveLone(debtorLoan)
     }
 
+    override suspend fun saveUpdateALLone(loans: List<DebtorLoan>) {
+        appDoa.saveAllLone(loans)
+    }
+
+    override suspend fun getLoanByDebtorId(id: Int): Flow<List<DebtorLoan>> {
+        return appDoa.getLoanByDebtorId(id)
+    }
+
     override suspend fun deleteLone(debtorLoan: DebtorLoan) {
         appDoa.deleteLone(debtorLoan)
     }

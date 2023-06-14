@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.Flow
 interface DebtorLoneRepository {
 
     suspend fun saveUpdateLone(debtorLoan: DebtorLoan);
+    suspend fun saveUpdateALLone(loans: List<DebtorLoan>);
+    suspend fun getLoanByDebtorId(id:Int): Flow<List<DebtorLoan>>;
 
     suspend fun deleteLone(debtorLoan: DebtorLoan);
 

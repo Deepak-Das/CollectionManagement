@@ -1,8 +1,6 @@
 package com.example.collectionmanagement.collection_book.prentation.Daily
 
-import android.content.ContentValues
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
@@ -39,10 +37,11 @@ import androidx.compose.ui.unit.toSize
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.collectionmanagement.R
+import com.example.collectionmanagement.collection_book.domain.model.DailyPayment
+import com.example.collectionmanagement.collection_book.domain.model.DebtorLoan
 import com.example.collectionmanagement.collection_book.domain.model.DebtorPayment
 import com.example.collectionmanagement.collection_book.prentation.Debtor.CustomIconText
 import com.example.collectionmanagement.collection_book.prentation.theme.option4
-import com.example.collectionmanagement.collection_book.prentation.theme.option5
 import com.example.collectionmanagement.collection_book.prentation.utils.Ams
 import com.example.dailymoneyrecord.recorde_Book.domain.util.OrderBy
 import com.example.dailymoneyrecord.recorde_Book.domain.util.OrderType
@@ -53,35 +52,48 @@ import kotlinx.coroutines.launch
 fun DailyScreen(
      viewModel: DailyViewModel = hiltViewModel(),
      navHostController: NavHostController,
+     context: Context = LocalContext.current
 ){
      val state=viewModel.state.value
-     Scaffold(bottomBar = {
+     val scope =rememberCoroutineScope()
+     Scaffold(
+          topBar = {
+               DailyRecordHeader(date = state.date, f ={ l, d->
+                    viewModel.setDate(l,d)
+                    viewModel.setTimeStamp(l)
+               } ,onFilterClick=viewModel::setIsFilter,state.isFilter,state.totalCount,state.totalAmount)
+
+          },
+          bottomBar = {
          BottomBarBox(viewModel = viewModel)
      }) {
           Column(
                Modifier
                     .padding(it)
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .padding(horizontal = 10.dp),
           horizontalAlignment = Alignment.CenterHorizontally
                ) {
 
-               //Todo : on expend debtor List
-               /*if(state.is){
-                    Spacer(modifier = Modifier.height(20.dp))
-               }*/
-               DatePickComp(date = state.date, f ={ l, d->
-                    viewModel.setDate(l,d)
-                    viewModel.setTimeStamp(l)
-               } ,onFilterClick=viewModel::setIsFilter,state.isFilter)
+/*
+                              if(state.hasFocus){
+                    Spacer(modifier = Modifier.height(70.dp))
+
+               }
+*/
                Spacer(modifier = Modifier.width(10.dp))
                AnimatedVisibility(visible =state.isFilter ) {
                     DailyFilterBox( viewModel )
+                    Spacer(modifier = Modifier.height(20.dp))
                }
+
+
 
 
                LazyColumn(
                     modifier = Modifier
-                         .fillMaxSize(),
+                         .fillMaxWidth()
+                         .weight(1f),
                ) {
 
 
@@ -89,20 +101,26 @@ fun DailyScreen(
 
                               DebtorPayCard(
                                    dailyPayment = it,
-                                   editLone = {
+                                   onEditClick = {
                                               viewModel.setEditPay(it)
+                                        viewModel.setIsDebtorExpended(false)
                                    },
                                    onClickDelete = {
                                         viewModel.deletePay(it)
 
                                    },
                                    onClickAddLoan = {
-                                        //todo: Get loan by id
+                                        viewModel.setIsAddLone(true)
+                                        viewModel.setLoneDebtor(it)
 
 //                                        navHostController.navigate(route = Router.PaymentByIdScreen.toString())
 
 
 
+                                   },
+                                   onSetAllClick = {
+                                        viewModel.setIsWarning(true)
+                                        viewModel.setDpl(it)
                                    }
 
                               )
@@ -112,22 +130,48 @@ fun DailyScreen(
 
                }
 
+               Ams.Waring(
+                    status = state.isWaring,
+                    msg = "Are You sure want to make all loan to be Paid",
+                    openDialog =viewModel::setIsWarning ,
+                    onclickSure = {
+                         scope.launch {
+                              viewModel.setAllPaid(state.dpl, context)
+                         }
+                                  },
+                    onclickCancel =viewModel::setIsWarning
+               )
+
+               AddDebtorLone(
+                    status = state.isAddLone,
+                    setStatusFn = viewModel::setIsAddLone,
+                    onClickAdd = {
+                         viewModel.setIsAddLone(false)
+
+                                 viewModel.saveLoan(it)
+                    },
+                    dailyPayment = state.dailyLoneDebtor,
+                    viewModel = viewModel
+               )
+
           }
      }
 
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomBarBox(
+fun AddDebtorLone(
+     status: Boolean,
+     setStatusFn: (Boolean) -> Unit,
+     onClickAdd: (DebtorLoan) -> Unit,
      viewModel: DailyViewModel,
-     context: Context = LocalContext.current,
+     dailyPayment: DailyPayment?,
+     context:Context = LocalContext.current
 
 ) {
 
      val calenderState = rememberSheetState()
-     val scope= rememberCoroutineScope()
 
      var name by remember {
           mutableStateOf("")
@@ -158,6 +202,174 @@ fun BottomBarBox(
           date = dateStr
      }, calenderState = calenderState)
 
+     LaunchedEffect(key1 = dailyPayment, block = {
+          date=viewModel.state.value.date
+          name= dailyPayment?.debtorName ?:""
+          debtorId =dailyPayment?.debtorId?:null
+     })
+
+
+
+
+     if (status) {
+          AlertDialog(
+               onDismissRequest = { setStatusFn(false) }
+          ) {
+               Card {
+                    Column(
+                         Modifier.padding(vertical = 10.dp, horizontal = 20.dp),
+                         horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                         Text("Add Debtor", style = Ams.getMStyle())
+                         Spacer(modifier = Modifier.size(14.dp))
+
+                         OutlinedTextField(
+                              modifier = Modifier
+                                   .onGloballyPositioned {
+                                        searchFieldsize = it.size.toSize()
+                                   }
+                                   .onFocusChanged {
+                                        isDebtorExpend = it.isFocused
+                                   },
+                              readOnly = true,
+                              singleLine=true,
+                              value = name,
+                              maxLines = 1,
+                              keyboardActions = KeyboardActions(
+                                   onNext = {
+                                        calenderState.show()
+                                   }
+                              ),
+
+                              onValueChange = { name = it },
+                              label = { Text(text = "Name") },
+//                        placeholder = {
+//                            Text("--select on clicking icon--")
+//                        },
+                              leadingIcon = {
+                                   Icon(
+                                        modifier = Modifier.clickable { },
+                                        imageVector = Icons.Default.Person,
+                                        contentDescription = null)
+                              },
+                              keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Next)
+                         )
+
+                         OutlinedTextField(
+                              readOnly = true,
+                              value = date,
+                              maxLines = 1,
+                              suffix = {
+                                   Icon(modifier = Modifier.clickable {
+                                        calenderState.show()
+                                   }, imageVector = Icons.Default.Update, contentDescription = "")
+                              },
+                              onValueChange = { date = it },
+                              label = { Text(text = "Date") },
+                              leadingIcon = {
+                                   Icon(Icons.Default.Phone, contentDescription = null)
+                              },
+                         )
+                         OutlinedTextField(
+                              value = amount,
+                              maxLines = 1,
+                              onValueChange = { amount = it },
+                              label = { Text(text = "Amount") },
+                              leadingIcon = {
+                                   Icon(Icons.Default.Money, contentDescription = null)
+                              },
+                              keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                         )
+
+                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                              TextButton(onClick = {
+                                   setStatusFn(false)
+                                   name = ""
+                                   amount = ""
+                                   date=""
+                                   debtorId=null
+                              }) {
+                                   Text(text = "Cancel", style = Ams.getMStyle())
+                              }
+                              TextButton(onClick = {
+                                   if (debtorId == null||amount.isEmpty()||date.isEmpty()) {
+                                        Toast.makeText(
+                                             context,
+                                             "please fill all field",
+                                             Toast.LENGTH_SHORT
+                                        ).show()
+                                        return@TextButton
+                                   }
+                                   setStatusFn(false)
+                                   onClickAdd(
+                                        DebtorLoan(
+                                             loneId = null,
+                                             amount = amount.toInt(),
+                                             loneHolder = debtorId!!,
+                                             timestamp = Ams.dateToTimeStamp(date),
+                                             status = "Running"
+                                        )
+                                   )
+                                   name = ""
+                                   amount = ""
+                                   date=""
+                                   debtorId=null
+                              }) {
+                                   Text(text = "save", style = Ams.getMStyle())
+                              }
+                         }
+
+                    }
+               }
+          }
+     }
+
+
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BottomBarBox(
+     viewModel: DailyViewModel,
+     context: Context = LocalContext.current,
+
+) {
+
+     val calenderState = rememberSheetState()
+     val scope= rememberCoroutineScope()
+
+     var name by remember {
+          mutableStateOf("")
+     }
+
+     var date by remember {
+          mutableStateOf("")
+     }
+     var debtorId by remember {
+          mutableStateOf<Int?>(null)
+     }
+     var paymentId by remember {
+          mutableStateOf<Int?>(null)
+     }
+     var amount by remember {
+          mutableStateOf("")
+     }
+
+     var searchFieldsize by remember {
+          mutableStateOf(Size.Zero)
+     }
+
+
+
+
+
+
+
+     Ams.CalenderPop(f = { timeStamp, dateStr ->
+          date = dateStr
+     }, calenderState = calenderState)
+
      LaunchedEffect(key1 = true, block = {
           date= Ams.GLOBLE_DATE
      })
@@ -168,6 +380,7 @@ fun BottomBarBox(
                name=it.debtorName
                amount=it.amount.toString()
                debtorId=it.debtorId
+               paymentId=it.paymentId
 
           }
      })
@@ -185,7 +398,9 @@ fun BottomBarBox(
                horizontalAlignment = Alignment.CenterHorizontally
           ) {
 
-               AnimatedVisibility(visible = isDebtorExpend) {
+
+
+               AnimatedVisibility(visible = viewModel.state.value.isDebtorExpend) {
                     Card(
                          elevation = CardDefaults.cardElevation(
                               defaultElevation = 8.0.dp
@@ -216,7 +431,7 @@ fun BottomBarBox(
                                         },
                                              onClick = {
                                                   scope.launch{
-                                                       isDebtorExpend = false
+                                                       viewModel.setIsDebtorExpended(false)
                                                        debtorId = it.debtorId
                                                        name = it.name
                                                        focusRequesterName.freeFocus()
@@ -236,7 +451,7 @@ fun BottomBarBox(
                                         },
                                              onClick = {
                                                   scope.launch {
-                                                       isDebtorExpend = false
+                                                       viewModel.setIsDebtorExpended(false)
                                                        debtorId = it.debtorId
                                                        name = it.name
                                                        focusRequesterName.freeFocus()
@@ -259,7 +474,8 @@ fun BottomBarBox(
                               searchFieldsize = it.size.toSize()
                          }
                          .onFocusChanged {
-                              isDebtorExpend = it.isFocused
+                              viewModel.setIsDebtorExpended(it.isFocused)
+                              viewModel.setHasFocus(it.hasFocus)
                          }
                          .focusRequester(focusRequesterName),
                     singleLine=true,
@@ -278,7 +494,14 @@ fun BottomBarBox(
 //
                     leadingIcon = {
                          Icon(
-                              modifier = Modifier.clickable { isDebtorExpend=!isDebtorExpend },
+                              modifier = Modifier.clickable {
+                                   scope.launch {
+                                        focusRequesterAmount.freeFocus()
+                                        focusRequesterName.requestFocus()
+                                        focusRequesterName.captureFocus()
+                                        viewModel.setIsDebtorExpended(true)
+                                   }
+                                                            },
                               imageVector = Icons.Default.Person,
                               contentDescription = null)
                     },
@@ -287,30 +510,37 @@ fun BottomBarBox(
 
                OutlinedTextField(
                     value = amount,
-                    modifier = Modifier.focusRequester(focusRequesterAmount),
+                    modifier = Modifier
+                         .focusRequester(focusRequesterAmount)
+                         .onFocusChanged {
+                              viewModel.setHasFocus(it.hasFocus)
+
+                         },
                     maxLines = 1,
                     onValueChange = { amount = it },
                     label = { Text(text = "Amount") },
                     leadingIcon = {
-                         Icon(Icons.Default.Money, contentDescription = null)
+                         Icon(modifier = Modifier.clickable {
+                              focusRequesterName.freeFocus()
+                         },imageVector = Icons.Default.Money, contentDescription = null)
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions{
                          scope.launch{
+                              if(amount==""||debtorId==null){
+                                   Toast.makeText(context,"Can't Save",Toast.LENGTH_SHORT).show()
+                                   return@launch
+                              }
                              var  savePay=DebtorPayment(
-                                paymentId = null,
+                                paymentId = paymentId,
                                   paymentHolder = debtorId,
                                   amount=amount.toInt(),
                                   timestamp = viewModel.state.value.timeStamp
                               )
-                              if(savePay.amount.toString().isEmpty()||savePay.paymentHolder==null){
-                                   viewModel.saveUpdatePay(savePay)
-
-                                   Toast.makeText(context,"All field required",Toast.LENGTH_SHORT)
-                                   return@launch
-                              }
+                              viewModel.saveUpdatePay(savePay)
                               name=""
                               debtorId=null
+                              paymentId=null
                               amount=""
                               focusRequesterAmount.freeFocus()
                               focusRequesterName.requestFocus()
@@ -328,16 +558,18 @@ fun BottomBarBox(
 
 
 @Composable
-fun DatePickComp(
+fun DailyRecordHeader(
      date: String,
      f: (Long, String) -> Unit,
      onFilterClick:(Boolean)->Unit,
-     isFilter:Boolean
+     isFilter:Boolean,
+     totalCount:Int,
+     totalAmount:Int
 ) {
 
 
      val colInteraction = remember { MutableInteractionSource() }
-     val calenderState = com.maxkeppeker.sheets.core.models.base.rememberSheetState()
+     val calenderState = rememberSheetState()
 
      Ams.CalenderPop(f = f, calenderState = calenderState)
 
@@ -368,7 +600,7 @@ fun DatePickComp(
                               interactionSource = colInteraction,
                               indication = null
                          )
-                         .size(40.dp),
+                         .size(30.dp),
                          painter = painterResource(id = R.drawable.calendar_icon),
                          contentDescription = "Calender Icon",
 
@@ -376,7 +608,6 @@ fun DatePickComp(
                     Spacer(modifier = Modifier.width(40.dp))
                     Text(modifier = Modifier.clickable(
                          onClick = {
-                              Log.d(ContentValues.TAG, "HomePage: Click")
                               calenderState.show()
                          },
                          interactionSource = colInteraction,
@@ -385,7 +616,7 @@ fun DatePickComp(
                          text = date, style = TextStyle(
                               color = Color.White,
                               fontWeight = FontWeight.SemiBold,
-                              fontSize = 24.sp
+                              fontSize = 18.sp
                          )
                     )
                     Spacer(modifier = Modifier.width(40.dp))
@@ -403,20 +634,20 @@ fun DatePickComp(
                horizontalArrangement = Arrangement.SpaceAround,
                     verticalAlignment = Alignment.CenterVertically
                     ){
-                    Text("54100")
+                    Text(totalAmount.toString(), style = Ams.getMStyle(color = Color.Green, fontSize = 16.sp))
                     Box(
                          modifier = Modifier
                               .width(6.dp)
-                              .height(50.dp)
+                              .height(30.dp)
                               .background(
                                    color = Color.White,
                                    shape = MaterialTheme.shapes.medium
                               ),
                     )
-                    Text("100")
+                    Text(totalCount.toString(), style = Ams.getMStyle(color = Color.Green, fontSize = 16.sp))
 
                }
-               Spacer(modifier = Modifier.height(20.dp))
+               Spacer(modifier = Modifier.height(10.dp))
           }
      }
 }
@@ -432,7 +663,7 @@ private fun DailyFilterBox(
           elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
           shape = MaterialTheme.shapes.medium,
           colors = CardDefaults.cardColors(
-               containerColor = MaterialTheme.colorScheme.primaryContainer
+               containerColor = MaterialTheme.colorScheme.inversePrimary
           )
      ) {
           Column(

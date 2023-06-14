@@ -378,9 +378,9 @@ fun ImportDbFilePopUp(
 
     var scope = rememberCoroutineScope()
     AlertDialog(onDismissRequest = { viewModel.setIsPick(false) }) {
-        Card {
+        Card(Modifier.height(intrinsicSize = IntrinsicSize.Min)) {
             Column(
-                modifier = Modifier.padding(10.dp),
+                modifier = Modifier.padding(10.dp).height(intrinsicSize = IntrinsicSize.Min),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 

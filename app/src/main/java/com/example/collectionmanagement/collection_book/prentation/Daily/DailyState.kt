@@ -14,7 +14,16 @@ data class DailyState (
     val timeStamp:Long =Ams.GLOBLE_TIMSTAMP,
     var editPayment: DailyPayment? =null,
     var deletePayment: DebtorPayment? =null,
+    var dailyLoneDebtor: DailyPayment? =null,
     val orderBy: OrderBy= OrderBy.Id(OrderType.Descending),
-    val isFilter: Boolean=false
+    val isFilter: Boolean=false,
+    val isDebtorExpend: Boolean=false,
+    val hasFocus: Boolean=false,
+    val isAddLone: Boolean=false,
+    val isWaring: Boolean=false,
+    val totalCount:Int=0,
+    val totalAmount:Int=0,
+    val dpl:DebtorPayment?=null
+
 
 )
