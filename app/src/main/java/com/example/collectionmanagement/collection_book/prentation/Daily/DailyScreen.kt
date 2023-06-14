@@ -436,7 +436,6 @@ fun BottomBarBox(
                                                        name = it.name
                                                        focusRequesterName.freeFocus()
                                                        focusRequesterAmount.requestFocus()
-                                                       focusRequesterAmount.captureFocus()
                                                   }
                                              })
                                    }
@@ -456,7 +455,6 @@ fun BottomBarBox(
                                                        name = it.name
                                                        focusRequesterName.freeFocus()
                                                        focusRequesterAmount.requestFocus()
-                                                       focusRequesterAmount.captureFocus()
 
 
                                                   }
@@ -485,7 +483,6 @@ fun BottomBarBox(
                      scope.launch {
                           focusRequesterName.freeFocus()
                           focusRequesterAmount.requestFocus()
-                          focusRequesterAmount.captureFocus()
                      }
                     },
 
@@ -498,7 +495,6 @@ fun BottomBarBox(
                                    scope.launch {
                                         focusRequesterAmount.freeFocus()
                                         focusRequesterName.requestFocus()
-                                        focusRequesterName.captureFocus()
                                         viewModel.setIsDebtorExpended(true)
                                    }
                                                             },
@@ -544,7 +540,6 @@ fun BottomBarBox(
                               amount=""
                               focusRequesterAmount.freeFocus()
                               focusRequesterName.requestFocus()
-                              focusRequesterName.captureFocus()
                          }
                     }
                )
