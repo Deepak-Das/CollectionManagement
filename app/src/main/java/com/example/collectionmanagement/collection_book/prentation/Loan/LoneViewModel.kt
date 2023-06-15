@@ -95,6 +95,8 @@ class LoneViewModel @Inject constructor(
         var filter= emptyList<LoanWithName>()
         loneJob?.cancel()
         loneJob=userCases.getAllLone(state.value.status).onEach {loneList->
+
+            var sum=loneList.sumOf { it.LoneAmount }
             if(state.value.search.isNotEmpty()) {
                  filter = loneList.filter {
                     it.DebtorName.contains(state.value.search, ignoreCase = true)
@@ -104,7 +106,9 @@ class LoneViewModel @Inject constructor(
                 _state.value=state.value.copy(
                     filtertloneList = filter,
                     loneWithNameList = loneList,
-                    loneGroup = groupBy
+                    loneGroup = groupBy,
+                    totalCount = loneList.size,
+                    totalSum = sum
                 )
 
             }else{

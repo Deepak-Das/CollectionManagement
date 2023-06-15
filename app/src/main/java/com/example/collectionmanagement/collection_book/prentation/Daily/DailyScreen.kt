@@ -35,7 +35,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import com.example.collectionmanagement.R
 import com.example.collectionmanagement.collection_book.domain.model.DailyPayment
 import com.example.collectionmanagement.collection_book.domain.model.DebtorLoan
@@ -51,7 +50,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun DailyScreen(
      viewModel: DailyViewModel = hiltViewModel(),
-     navHostController: NavHostController,
+//     navHostController: NavHostController,
      context: Context = LocalContext.current
 ){
      val state=viewModel.state.value
@@ -99,7 +98,7 @@ fun DailyScreen(
 
                          items(state.dailyPaysList) {
 
-                              DebtorPayCard(
+                              DailyCard(
                                    dailyPayment = it,
                                    onEditClick = {
                                               viewModel.setEditPay(it)
@@ -161,7 +160,7 @@ fun DailyScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddDebtorLone(
+private fun AddDebtorLone(
      status: Boolean,
      setStatusFn: (Boolean) -> Unit,
      onClickAdd: (DebtorLoan) -> Unit,
@@ -330,7 +329,7 @@ fun AddDebtorLone(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomBarBox(
+private fun BottomBarBox(
      viewModel: DailyViewModel,
      context: Context = LocalContext.current,
 
@@ -553,7 +552,7 @@ fun BottomBarBox(
 
 
 @Composable
-fun DailyRecordHeader(
+private fun DailyRecordHeader(
      date: String,
      f: (Long, String) -> Unit,
      onFilterClick:(Boolean)->Unit,
@@ -629,7 +628,7 @@ fun DailyRecordHeader(
                horizontalArrangement = Arrangement.SpaceAround,
                     verticalAlignment = Alignment.CenterVertically
                     ){
-                    Text(totalAmount.toString(), style = Ams.getMStyle(color = Color.Green, fontSize = 16.sp))
+                    Text(totalAmount.toString(), style = Ams.getBStyle(color = Color.Green, fontSize = 16.sp))
                     Box(
                          modifier = Modifier
                               .width(6.dp)
@@ -639,7 +638,7 @@ fun DailyRecordHeader(
                                    shape = MaterialTheme.shapes.medium
                               ),
                     )
-                    Text(totalCount.toString(), style = Ams.getMStyle(color = Color.Green, fontSize = 16.sp))
+                    Text(totalCount.toString(), style = Ams.getBStyle(color = Color.Green, fontSize = 16.sp))
 
                }
                Spacer(modifier = Modifier.height(10.dp))

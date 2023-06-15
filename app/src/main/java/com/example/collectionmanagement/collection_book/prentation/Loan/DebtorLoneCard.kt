@@ -16,9 +16,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavHostController
 import com.example.collectionmanagement.R
 import com.example.collectionmanagement.collection_book.domain.model.DebtorLoan
 import com.example.collectionmanagement.collection_book.domain.model.LoanWithName
+import com.example.collectionmanagement.collection_book.prentation.navigation.Router
 import com.example.collectionmanagement.collection_book.prentation.utils.Ams
 import java.util.*
 
@@ -28,7 +30,8 @@ fun DebtorLoneCard(
     loneWithName: LoanWithName,
     editLone: (LoanWithName) -> Unit,
     onClickDelete: (DebtorLoan) -> Unit,
-    onClickSwitch: (DebtorLoan) -> Unit
+    onClickSwitch: (DebtorLoan) -> Unit,
+    navHostController: NavHostController
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -91,10 +94,57 @@ fun DebtorLoneCard(
                         )
                     }
                     Spacer(modifier = Modifier.size(10.dp))
-                    CustomIconText(
-                        icon = Icons.Default.DateRange,
-                        txt = Ams.timeStampToDate(timeStamp = loneWithName.timeStamp)
-                    )
+                    Row(){
+                        CustomIconText(
+                            icon = Icons.Default.DateRange,
+                            txt = Ams.timeStampToDate(timeStamp = loneWithName.timeStamp)
+                        )
+                        Box(
+                            Modifier
+                                .background(
+                                    color = MaterialTheme.colorScheme.primary,
+                                    shape = MaterialTheme.shapes.medium
+                                )
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                                .align(alignment = Alignment.Bottom)
+                                .zIndex(2f)
+                                .clickable {
+                                    var id=loneWithName.debtorId
+                                    var timeStamp=loneWithName.timeStamp
+                                    var date=Ams.timeStampToDate(loneWithName.timeStamp)
+                                    navHostController.navigate("${Router.PaymentByIdScreen.toString()}/${id}/${timeStamp}/${date}")
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.edit),
+                                    contentDescription = null,
+                                    Modifier.size(15.dp)
+                                )
+                                Spacer(
+                                    modifier = Modifier.size(
+                                        width = 5.dp,
+                                        height = 0.dp
+                                    )
+                                )
+                                Text(
+                                    text = "GetPay",
+                                    style = Ams.getMStyle(
+                                        color = Color.White,
+                                        fontSize = 10.sp
+                                    )
+                                )
+                                Spacer(
+                                    modifier = Modifier.size(
+                                        width = 5.dp,
+                                        height = 0.dp
+                                    )
+                                )
+
+                            }
+                        }
+                    }
                     Spacer(modifier = Modifier.size(10.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),

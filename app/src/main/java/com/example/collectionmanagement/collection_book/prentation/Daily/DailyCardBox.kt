@@ -25,9 +25,8 @@ import com.example.collectionmanagement.collection_book.prentation.theme.option2
 import com.example.collectionmanagement.collection_book.prentation.utils.Ams
 import java.util.*
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DebtorPayCard(
+fun DailyCard(
     dailyPayment: DailyPayment,
     onEditClick: (DailyPayment) -> Unit,
     onClickDelete: (DebtorPayment) -> Unit,
@@ -297,7 +296,7 @@ fun DebtorPayCard(
 }
 
 @Composable
-fun CustomIconText(
+private fun CustomIconText(
     icon: ImageVector,
     txt: String
 ) {

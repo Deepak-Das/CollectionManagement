@@ -12,6 +12,8 @@ data class LoneState(
     val filtertloneList:List<LoanWithName> = emptyList(),
     val loneGroup:Map<Long, List<LoanWithName>> = emptyMap(),
     val search: String="",
+    val totalCount: Int=0,
+    val totalSum: Int=0,
     val status:Status=Status.Running(OrderType.Descending),
     var isWarning: Boolean=false,
     val deleteLoneData: DebtorLoan? = null,

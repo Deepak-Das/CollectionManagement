@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.collectionmanagement.collection_book.domain.model.DailyPayment
 import com.example.collectionmanagement.collection_book.domain.model.DebtorLoan
 import com.example.collectionmanagement.collection_book.domain.model.DebtorPayment
+import com.example.collectionmanagement.collection_book.domain.use_case.GetPaymentsByIdAndTime
 import com.example.collectionmanagement.collection_book.domain.use_case.UserCases
 import com.example.dailymoneyrecord.recorde_Book.domain.util.OrderBy
 import com.example.dailymoneyrecord.recorde_Book.domain.util.OrderType
@@ -20,12 +21,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DailyViewModel @Inject constructor(
+class PaymentsViewModel @Inject constructor(
     private val useCases:UserCases
 ) :ViewModel() {
 
-    private val _state = mutableStateOf<DailyState>(DailyState())
-    val state: State<DailyState> = _state
+    private val _state = mutableStateOf<PaymentsState>(PaymentsState())
+    val state: State<PaymentsState> = _state
 
     var debtorJob: Job?=null
     var paymentJob: Job?=null
@@ -34,7 +35,6 @@ class DailyViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             getAllDebtor()
-            getDailyPay()
         }
     }
 
@@ -47,9 +47,9 @@ class DailyViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-   fun  getDailyPay(){
+   fun  getDailyPay(id:Int,timeStamp: Long){
        paymentJob?.cancel()
-       paymentJob=useCases.dailyPayment(state.value.timeStamp,state.value.orderBy).onEach {
+       paymentJob= useCases.paymentsByIdAndTime(id,timeStamp,state.value.orderBy).onEach {
            var totalamount=it.sumOf {
                it.amount
            }
@@ -67,23 +67,18 @@ class DailyViewModel @Inject constructor(
 
 
 
-    fun setDate(timeStamp: Long,date: String) {
+    fun setDateAndId(timeStamp: Long,date: String,id:Int) {
         viewModelScope.launch {
             _state.value = state.value.copy(
                 date = date,
-                timeStamp = timeStamp
+                timeStamp = timeStamp,
+                id = id
             )
-            getDailyPay()
         }
     }
 
-    fun setTimeStamp(timeStamp: Long) {
-        viewModelScope.launch {
-            _state.value = state.value.copy(
-                timeStamp = timeStamp
-            )
-        }
-    } fun setIsFilter(value: Boolean) {
+
+    fun setIsFilter(value: Boolean) {
         viewModelScope.launch {
             _state.value = state.value.copy(
                 isFilter = value
@@ -95,7 +90,7 @@ class DailyViewModel @Inject constructor(
             _state.value = state.value.copy(
                 orderBy = orderBy
             )
-            getDailyPay()
+            getDailyPay(state.value.id,state.value.timeStamp)
         }
     }
 

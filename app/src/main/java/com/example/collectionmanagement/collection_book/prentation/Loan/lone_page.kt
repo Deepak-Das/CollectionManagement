@@ -5,8 +5,10 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -23,19 +25,24 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import com.example.collectionmanagement.R
 import com.example.collectionmanagement.collection_book.domain.model.DebtorLoan
 import com.example.collectionmanagement.collection_book.domain.model.LoanWithName
 import com.example.collectionmanagement.collection_book.prentation.Debtor.CustomIconText
 import com.example.collectionmanagement.collection_book.prentation.Loan.DebtorLoneCard
 import com.example.collectionmanagement.collection_book.prentation.Loan.LoneState
 import com.example.collectionmanagement.collection_book.prentation.Loan.LoneViewModel
+import com.example.collectionmanagement.collection_book.prentation.theme.option4
 import com.example.collectionmanagement.collection_book.prentation.utils.Ams
 import com.example.dailymoneyrecord.recorde_Book.domain.util.OrderType
 import com.example.dailymoneyrecord.recorde_Book.domain.util.Status
@@ -46,10 +53,10 @@ import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalFoundationApi::class)
-@Preview
 @Composable
 fun LoanPage(
-    viewModel: LoneViewModel = hiltViewModel()
+    viewModel: LoneViewModel = hiltViewModel(),
+    navHostController:NavHostController
 ) {
 
     val state = viewModel.state.value
@@ -104,6 +111,8 @@ fun LoanPage(
                 .padding(it)
                 .padding(10.dp)
         ) {
+            Spacer(modifier = Modifier.height(10.dp))
+
             Ams.CustomSearchBar(
                 getDebtor = {
                     viewModel.setSearch(it.name)
@@ -112,11 +121,15 @@ fun LoanPage(
                 query = state.search,
                 setQuery = viewModel::setSearch,
                 menuContent = {
-                    LoanHeaderBox(state, viewModel)
+                    LoanFilterBox(state, viewModel)
                 }
             )
 
 
+            Spacer(modifier = Modifier.height(10.dp))
+            HeaderRecordHeader(date=Ams.GLOBLE_DATE,f={ d,l->
+
+            }, totalAmount = state.totalSum, totalCount = state.totalCount)
             Spacer(modifier = Modifier.height(10.dp))
 
             LazyColumn(
@@ -148,7 +161,8 @@ fun LoanPage(
                             }, onClickDelete = viewModel::setDeleteLoneData,
                             onClickSwitch = {
                                 viewModel.saveUpdateLone(it)
-                            }
+                            },
+                            navHostController = navHostController
                         )
                         Spacer(modifier = Modifier.size(10.dp))
 
@@ -203,7 +217,95 @@ fun LoanPage(
 }
 
 @Composable
-private fun LoanHeaderBox(
+private fun HeaderRecordHeader(
+    date: String,
+    f: (Long, String) -> Unit,
+    totalCount:Int,
+    totalAmount:Int
+) {
+
+
+    val colInteraction = remember { MutableInteractionSource() }
+    val calenderState = rememberSheetState()
+
+    Ams.CalenderPop(f = f, calenderState = calenderState)
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .padding(10.dp)
+            .fillMaxWidth()
+            .height(intrinsicSize = IntrinsicSize.Min)
+            .background(color = option4, shape = ShapeDefaults.Medium)
+    ) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .height(intrinsicSize = IntrinsicSize.Min)) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 10.dp),
+                Arrangement.Center,
+                Alignment.CenterVertically
+            ) {
+                Image(modifier = Modifier
+                    .clickable(
+                        onClick = {
+//                            calenderState.show()
+                        },
+                        interactionSource = colInteraction,
+                        indication = null
+                    )
+                    .size(30.dp),
+                    painter = painterResource(id = R.drawable.calendar_icon),
+                    contentDescription = "Calender Icon",
+
+                    )
+                Spacer(modifier = Modifier.width(40.dp))
+                Text(modifier = Modifier.clickable(
+                    onClick = {
+//                        calenderState.show()
+                    },
+                    interactionSource = colInteraction,
+                    indication = null
+                ),
+                    text = date, style = TextStyle(
+                        color = Color.White,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 18.sp
+                    )
+                )
+
+
+            }
+            Row (
+                Modifier
+                    .fillMaxWidth()
+                    .height(intrinsicSize = IntrinsicSize.Min),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Text(totalAmount.toString(), style = Ams.getBStyle(color = Color.Green, fontSize = 16.sp))
+                Box(
+                    modifier = Modifier
+                        .width(6.dp)
+                        .height(30.dp)
+                        .background(
+                            color = Color.White,
+                            shape = MaterialTheme.shapes.medium
+                        ),
+                )
+                Text(totalCount.toString(), style = Ams.getBStyle(color = Color.Green, fontSize = 16.sp))
+
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+        }
+    }
+}
+
+@Composable
+private fun LoanFilterBox(
     state: LoneState,
     viewModel: LoneViewModel
 ) {
@@ -577,7 +679,7 @@ fun AddDebtorLone(
                             setStatusFn(false)
                             name = ""
                             amount = ""
-                            date=""
+                            date=Ams.GLOBLE_DATE
                             debtorId=null
                         }) {
                             Text(text = "Cancel", style = Ams.getMStyle())
@@ -603,7 +705,7 @@ fun AddDebtorLone(
                             )
                             name = ""
                             amount = ""
-                            date=""
+                            date=Ams.GLOBLE_DATE
                             debtorId=null
                         }) {
                             Text(text = "save", style = Ams.getMStyle())
